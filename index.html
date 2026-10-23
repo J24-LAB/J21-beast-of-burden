@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>工作资料归档 + 项目清单管理</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    background: #f0f2f5; color: #1f2937; height: 100vh; display: flex; overflow: hidden;
+  }
+
+  .sidebar {
+    width: 250px; background: #1e293b; color: #cbd5e1; flex-shrink: 0;
+    display: flex; flex-direction: column; overflow-y: auto;
+  }
+  .sidebar h1 {
+    font-size: 14px; color: #f8fafc; padding: 16px 14px 12px;
+    border-bottom: 1px solid #334155; font-weight: 600;
+  }
+  .mode-switch { display: flex; padding: 10px 10px 6px; gap: 4px; }
+  .mode-btn {
+    flex: 1; padding: 7px 6px; font-size: 11px; text-align: center; cursor: pointer;
+    border-radius: 5px; background: #334155; color: #94a3b8; transition: all .12s;
+    border: none; font-family: inherit;
+  }
+  .mode-btn:hover { background: #475569; color: #e2e8f0; }
+  .mode-btn.active { background: #3b82f6; color: #fff; font-weight: 600; }
+
+  .nav-group { padding: 4px 0; }
+  .nav-group-title {
+    font-size: 10px; text-transform: uppercase; letter-spacing: .5px;
+    color: #64748b; padding: 9px 14px 5px; font-weight: 600;
+  }
+  .nav-item {
+    padding: 8px 14px; font-size: 12px; cursor: pointer;
+    display: flex; align-items: center; gap: 7px;
+    border-left: 3px solid transparent; transition: all .12s;
+  }
+  .nav-item:hover { background: #334155; color: #f1f5f9; }
+  .nav-item.active { background: #334155; color: #fff; border-left-color: #3b82f6; }
+  .nav-item .icon { font-size: 14px; width: 18px; text-align: center; }
+  .nav-item .count {
+    margin-left: auto; font-size: 10px; background: #475569;
+    padding: 1px 6px; border-radius: 10px; color: #cbd5e1;
+  }
+
+  .project-item {
+    padding: 9px 12px; border-radius: 5px; cursor: pointer; margin: 0 6px 3px;
+    border-left: 3px solid transparent; transition: all .12s;
+  }
+  .project-item:hover { background: #334155; }
+  .project-item.active { background: #334155; border-left-color: #3b82f6; }
+  .project-item .pname { font-size: 12px; color: #f1f5f9; font-weight: 600; margin-bottom: 3px; }
+  .project-item .pmeta { font-size: 10px; color: #94a3b8; }
+  .project-item .pstats { font-size: 10px; color: #64748b; margin-top: 3px; }
+  .sidebar-btn-wrap { padding: 8px 10px; }
+  .sidebar-btn-wrap .btn { width: 100%; }
+
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  .topbar {
+    background: #fff; border-bottom: 1px solid #e5e7eb; padding: 11px 18px;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .topbar h2 { font-size: 14px; font-weight: 600; margin-right: auto; }
+  .topbar .sub { font-size: 11px; color: #6b7280; }
+
+  .btn {
+    padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer;
+    font-size: 12px; font-family: inherit; transition: all .12s;
+  }
+  .btn-primary { background: #2563eb; color: #fff; }
+  .btn-primary:hover { background: #1d4ed8; }
+  .btn-outline { background: #fff; border: 1px solid #d1d5db; color: #374151; }
+  .btn-outline:hover { background: #f9fafb; }
+  .btn-danger { background: #fff; border: 1px solid #fca5a5; color: #dc2626; }
+  .btn-danger:hover { background: #fef2f2; }
+  .btn-sm { padding: 4px 9px; font-size: 11px; }
+
+  .tabs { display: flex; gap: 2px; padding: 0 18px; background: #fff; border-bottom: 1px solid #e5e7eb; }
+  .tab {
+    padding: 9px 14px; font-size: 12px; cursor: pointer; color: #6b7280;
+    border-bottom: 2px solid transparent; transition: all .12s;
+  }
+  .tab:hover { color: #1f2937; }
+  .tab.active { color: #2563eb; border-bottom-color: #2563eb; font-weight: 600; }
+
+  .content { flex: 1; overflow-y: auto; padding: 14px 18px; }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 11px; }
+  .card {
+    background: #fff; border: 1px solid #e5e7eb; border-radius: 8px;
+    padding: 13px 15px; transition: box-shadow .15s;
+  }
+  .card:hover { box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 7px; gap: 8px; }
+  .card-title { font-size: 13px; font-weight: 600; color: #1f2937; }
+  .badge { font-size: 10px; padding: 2px 7px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; }
+  .badge-green { background: #dcfce7; color: #15803d; }
+  .badge-blue { background: #dbeafe; color: #1d4ed8; }
+  .badge-amber { background: #fef3c7; color: #b45309; }
+  .badge-gray { background: #f3f4f6; color: #4b5563; }
+  .card-meta { font-size: 11px; color: #6b7280; line-height: 1.8; }
+  .card-meta span { display: inline-block; margin-right: 10px; }
+  .card-note { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e5e7eb; font-size: 11px; color: #9ca3af; }
+  .card-actions { margin-top: 8px; display: flex; gap: 5px; }
+
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; font-size: 12px; }
+  th {
+    background: #f9fafb; text-align: left; padding: 8px 10px; font-weight: 600;
+    color: #6b7280; border-bottom: 1px solid #e5e7eb; font-size: 11px;
+  }
+  td { padding: 8px 10px; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafbfc; }
+  .tag {
+    display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 10px;
+    background: #eef2ff; color: #4338ca; margin-right: 3px; margin-bottom: 2px;
+  }
+  .tag-po { background: #fef3c7; color: #b45309; }
+  .tag-none { background: #f3f4f6; color: #9ca3af; }
+  .tag-proj { background: #e0f2fe; color: #0369a1; }
+  .amount { font-variant-numeric: tabular-nums; }
+  .cost { color: #b45309; font-weight: 600; }
+  .status-done { color: #15803d; }
+  .status-pending { color: #b45309; }
+  .diff-over { color: #dc2626; }
+  .diff-under { color: #15803d; }
+
+  .mask {
+    position: fixed; inset: 0; background: rgba(0,0,0,.4);
+    display: none; align-items: center; justify-content: center; z-index: 100;
+  }
+  .mask.show { display: flex; }
+  .modal {
+    background: #fff; border-radius: 10px; width: 600px; max-width: 94vw;
+    max-height: 90vh; overflow-y: auto; padding: 18px;
+  }
+  .modal h3 { font-size: 14px; margin-bottom: 14px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .form-row.full { grid-template-columns: 1fr; }
+  .form-row.three { grid-template-columns: 1fr 1fr 1fr; }
+  .field label { display: block; font-size: 11px; color: #6b7280; margin-bottom: 3px; font-weight: 600; }
+  .field input, .field select, .field textarea {
+    width: 100%; padding: 7px 9px; border: 1px solid #e5e7eb; border-radius: 6px;
+    font-size: 12px; font-family: inherit; outline: none;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: #2563eb; }
+  .field textarea { min-height: 55px; resize: vertical; }
+
+  .check-list { border: 1px solid #e5e7eb; border-radius: 6px; max-height: 200px; overflow-y: auto; }
+  .check-item {
+    display: flex; align-items: center; gap: 7px; padding: 7px 9px;
+    border-bottom: 1px solid #f3f4f6; font-size: 12px; cursor: pointer;
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-item:hover { background: #f9fafb; }
+  .check-item input { margin: 0; }
+  .check-item .ci-name { flex: 1; }
+  .check-item .ci-spec { color: #9ca3af; font-size: 10px; }
+
+  .modal-actions { display: flex; justify-content: flex-end; gap: 7px; margin-top: 14px; }
+  .empty { text-align: center; padding: 50px 20px; color: #9ca3af; font-size: 13px; }
+  .summary { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .summary .box { background: #fff; border: 1px solid #e5e7eb; border-radius: 7px; padding: 7px 12px; font-size: 11px; color: #6b7280; }
+  .summary .box b { color: #1f2937; font-size: 14px; margin-left: 4px; }
+  .hint { font-size: 11px; color: #9ca3af; margin-top: 6px; }
+  ::-webkit-scrollbar { width: 7px; }
+  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <h1>📁 工作管理平台</h1>
+  <div class="mode-switch">
+    <button class="mode-btn active" id="modeArchiveBtn" onclick="switchMode('archive')">资料归档</button>
+    <button class="mode-btn" id="modeProjectBtn" onclick="switchMode('project')">项目清单</button>
+  </div>
+
+  <div id="archiveNav">
+    <div class="nav-group">
+      <div class="nav-item active" data-cat="all" onclick="switchArchiveCat('all')">
+        <span class="icon">📋</span> 全部资料 <span class="count" id="countAll">0</span>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">🏛️ 招投标</div>
+      <div class="nav-item" data-cat="bid-info" onclick="switchArchiveCat('bid-info')"><span class="icon">🔍</span> 招标信息台账 <span class="count" id="countBidInfo">0</span></div>
+      <div class="nav-item" data-cat="bid-qual" onclick="switchArchiveCat('bid-qual')"><span class="icon">📜</span> 资质/业绩库 <span class="count" id="countBidQual">0</span></div>
+      <div class="nav-item" data-cat="bid-doc" onclick="switchArchiveCat('bid-doc')"><span class="icon">📄</span> 标书归档 <span class="count" id="countBidDoc">0</span></div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">📦 设备采购</div>
+      <div class="nav-item" data-cat="buy-plan" onclick="switchArchiveCat('buy-plan')"><span class="icon">📝</span> 采购计划/申请 <span class="count" id="countBuyPlan">0</span></div>
+      <div class="nav-item" data-cat="buy-supplier" onclick="switchArchiveCat('buy-supplier')"><span class="icon">🏢</span> 供应商/报价 <span class="count" id="countBuySupplier">0</span></div>
+      <div class="nav-item" data-cat="buy-contract" onclick="switchArchiveCat('buy-contract')"><span class="icon">✍️</span> 合同/验收 <span class="count" id="countBuyContract">0</span></div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">🏢 办公室日常</div>
+      <div class="nav-item" data-cat="office-doc" onclick="switchArchiveCat('office-doc')"><span class="icon">📑</span> 公文/制度 <span class="count" id="countOfficeDoc">0</span></div>
+      <div class="nav-item" data-cat="office-meet" onclick="switchArchiveCat('office-meet')"><span class="icon">📅</span> 会议/接待 <span class="count" id="countOfficeMeet">0</span></div>
+      <div class="nav-item" data-cat="office-misc" onclick="switchArchiveCat('office-misc')"><span class="icon">🔧</span> 其他事务 <span class="count" id="countOfficeMisc">0</span></div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">💰 办公费用</div>
+      <div class="nav-item" data-cat="fee-daily" onclick="switchArchiveCat('fee-daily')"><span class="icon">🛒</span> 日常办公费 <span class="count" id="countFeeDaily">0</span></div>
+      <div class="nav-item" data-cat="fee-travel" onclick="switchArchiveCat('fee-travel')"><span class="icon">✈️</span> 差旅/交通 <span class="count" id="countFeeTravel">0</span></div>
+      <div class="nav-item" data-cat="fee-other" onclick="switchArchiveCat('fee-other')"><span class="icon">📊</span> 其他费用 <span class="count" id="countFeeOther">0</span></div>
+    </div>
+  </div>
+
+  <div id="projectNav" style="display:none;">
+    <div class="sidebar-btn-wrap">
+      <button class="btn btn-primary" onclick="openProjectModal()">＋ 新建项目</button>
+    </div>
+    <div id="projectList"></div>
+  </div>
+</div>
+
+<div class="main">
+  <div id="archiveTopbar">
+    <div class="topbar">
+      <h2 id="arcCatTitle">全部资料</h2>
+      <span class="sub" id="arcCatDesc">所有分类的资料汇总</span>
+      <button class="btn btn-primary" onclick="openArchiveModal()">＋ 新增资料</button>
+    </div>
+    <div style="padding:9px 18px;background:#fff;border-bottom:1px solid #e5e7eb;">
+      <input type="text" id="arcSearch" placeholder="搜索名称、备注、供应商、关联项目..." oninput="renderArchiveCards()"
+        style="width:100%;max-width:380px;padding:7px 11px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px;outline:none;">
+    </div>
+  </div>
+
+  <div id="projectTopbar" style="display:none;">
+    <div class="topbar">
+      <h2 id="projTitle">请选择左侧项目</h2>
+      <span class="sub" id="projMeta"></span>
+      <button class="btn btn-outline btn-sm" onclick="openItemModal()">＋ 清单单项</button>
+      <button class="btn btn-outline btn-sm" onclick="openPOModal()">＋ 采购单</button>
+      <button class="btn btn-outline btn-sm" onclick="editProject()">编辑项目</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteProject()">删除项目</button>
+    </div>
+    <div class="tabs" id="tabs">
+      <div class="tab active" data-tab="items" onclick="switchProjectTab('items')">清单单项</div>
+      <div class="tab" data-tab="pos" onclick="switchProjectTab('pos')">采购单</div>
+      <div class="tab" data-tab="matrix" onclick="switchProjectTab('matrix')">关联总览</div>
+      <div class="tab" data-tab="proj-archive" onclick="switchProjectTab('proj-archive')">关联资料</div>
+    </div>
+  </div>
+
+  <div class="content" id="contentArea"></div>
+</div>
+
+<div class="mask" id="archiveMask">
+  <div class="modal">
+    <h3 id="archiveModalTitle">新增资料</h3>
+    <input type="hidden" id="aEditId">
+    <div class="form-row">
+      <div class="field"><label>资料名称 *</label><input id="aName" placeholder="如：XX项目招标文件"></div>
+      <div class="field"><label>分类</label>
+        <select id="aCat">
+          <option value="bid-info">招标信息台账</option>
+          <option value="bid-qual">资质/业绩库</option>
+          <option value="bid-doc">标书归档</option>
+          <option value="buy-plan">采购计划/申请</option>
+          <option value="buy-supplier">供应商/报价</option>
+          <option value="buy-contract">合同/验收</option>
+          <option value="office-doc">公文/制度</option>
+          <option value="office-meet">会议/接待</option>
+          <option value="office-misc">其他事务</option>
+          <option value="fee-daily">日常办公费</option>
+          <option value="fee-travel">差旅/交通</option>
+          <option value="fee-other">其他费用</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label>状态</label>
+        <select id="aStatus"><option>进行中</option><option>已完成</option><option>待处理</option><option>已归档</option></select>
+      </div>
+      <div class="field"><label>关联项目（可选）</label>
+        <select id="aProject"><option value="">不关联</option></select>
+      </div>
+    </div>
+    <div class="form-row three">
+      <div class="field"><label>日期</label><input type="date" id="aDate"></div>
+      <div class="field"><label>金额（元，可选）</label><input type="number" id="aAmount" step="0.01" placeholder="0"></div>
+      <div class="field"><label>关联方/供应商</label><input id="aRelated" placeholder="如：XX公司"></div>
+    </div>
+    <div class="form-row full">
+      <div class="field"><label>备注 / 要点</label><textarea id="aNote" placeholder="关键信息、截止日期、保管期限、归档位置等"></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeMask('archiveMask')">取消</button>
+      <button class="btn btn-primary" onclick="saveArchive()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="projectMask">
+  <div class="modal">
+    <h3 id="projectModalTitle">新建项目</h3>
+    <input type="hidden" id="pEditId">
+    <div class="form-row">
+      <div class="field"><label>项目名称 *</label><input id="pName" placeholder="如：XX医院设备采购项目"></div>
+      <div class="field"><label>项目编号</label><input id="pCode" placeholder="如：ZB-2026-001"></div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label>状态</label><select id="pStatus"><option>进行中</option><option>已完成</option><option>已归档</option></select></div>
+      <div class="field"><label>负责人</label><input id="pOwner" placeholder="姓名"></div>
+    </div>
+    <div class="form-row full">
+      <div class="field"><label>备注</label><textarea id="pNote" placeholder="项目背景、关键节点等"></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeMask('projectMask')">取消</button>
+      <button class="btn btn-primary" onclick="saveProject()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="itemMask">
+  <div class="modal">
+    <h3 id="itemModalTitle">新增清单单项</h3>
+    <input type="hidden" id="iEditId">
+    <div class="form-row">
+      <div class="field"><label>单项名称 *</label><input id="iName" placeholder="如：机架式服务器"></div>
+      <div class="field"><label>规格/型号</label><input id="iSpec" placeholder="如：2U / 64核 / 256G"></div>
+    </div>
+    <div class="form-row three">
+      <div class="field"><label>数量</label><input type="number" id="iQty" value="1" min="0"></div>
+      <div class="field"><label>单位</label><input id="iUnit" placeholder="台/套/批"></div>
+      <div class="field"><label>预算单价（元）</label><input type="number" id="iPrice" step="0.01" placeholder="0"></div>
+    </div>
+    <div class="form-row full">
+      <div class="field"><label>备注</label><textarea id="iNote" placeholder="技术要求、到货要求等"></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeMask('itemMask')">取消</button>
+      <button class="btn btn-primary" onclick="saveItem()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="poMask">
+  <div class="modal">
+    <h3 id="poModalTitle">新增采购单</h3>
+    <input type="hidden" id="poEditId">
+    <div class="form-row">
+      <div class="field"><label>采购单号 *</label><input id="poNo" placeholder="如：PO-2026-1015-01"></div>
+      <div class="field"><label>供应商</label><input id="poSupplier" placeholder="如：A科技有限公司"></div>
+    </div>
+    <div class="form-row three">
+      <div class="field"><label>采购日期</label><input type="date" id="poDate"></div>
+      <div class="field"><label>金额（元）</label><input type="number" id="poAmount" step="0.01" placeholder="0"></div>
+      <div class="field"><label>状态</label>
+        <select id="poStatus"><option>待审批</option><option>已下单</option><option>已到货</option><option>已验收</option><option>已付款</option></select>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="field">
+        <label>关联清单单项（可多选）*</label>
+        <div class="check-list" id="itemCheckList"></div>
+        <div class="hint">勾选这张采购单对应的清单单项，可多选。金额将按勾选数量均摊到各单项的成本栏。</div>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="field"><label>备注</label><textarea id="poNote" placeholder="付款条件、交货期等"></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeMask('poMask')">取消</button>
+      <button class="btn btn-primary" onclick="savePO()">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   常量与工具
+   ========================================================= */
+const KEY_ARCH = 'work_materials_v1';
+const KEY_P = 'pc_projects_v1';
+const KEY_I = 'pc_items_v1';
+const KEY_O = 'pc_pos_v1';
+
+const CATS = {
+  'bid-info':    { name: '招标信息台账', desc: '招标公告、报名时间、开标时间、结果', icon: '🔍' },
+  'bid-qual':    { name: '资质/业绩库', desc: '营业执照、资质证书、人员证书、业绩合同', icon: '📜' },
+  'bid-doc':     { name: '标书归档', desc: '投标文件、中标通知书、未中标复盘', icon: '📄' },
+  'buy-plan':    { name: '采购计划/申请', desc: '采购申请单、技术参数、预算', icon: '📝' },
+  'buy-supplier':{ name: '供应商/报价', desc: '供应商信息、报价单、比价记录', icon: '🏢' },
+  'buy-contract':{ name: '合同/验收', desc: '采购合同、到货验收、发票', icon: '✍️' },
+  'office-doc':  { name: '公文/制度', desc: '规章制度、通知文件、用印记录', icon: '📑' },
+  'office-meet': { name: '会议/接待', desc: '会议纪要、接待安排、用车记录', icon: '📅' },
+  'office-misc': { name: '其他事务', desc: '临时交办、杂项记录', icon: '🔧' },
+  'fee-daily':   { name: '日常办公费', desc: '办公用品、耗材、印刷、快递', icon: '🛒' },
+  'fee-travel':  { name: '差旅/交通', desc: '差旅费、交通费、住宿', icon: '✈️' },
+  'fee-other':   { name: '其他费用', desc: '维修、水电、其他杂费', icon: '📊' }
+};
+
+let mode = 'archive';
+let currentCat = 'all';
+let currentProjectId = null;
+let currentProjectTab = 'items';
+
+let archives = [];
+let projects = [], items = [], pos = [];
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function esc(s) { return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmt(n) { return Number(n||0).toLocaleString('zh-CN', {maximumFractionDigits:2}); }
+
+function loadAll() {
+  try { archives = JSON.parse(localStorage.getItem(KEY_ARCH) || '[]'); } catch(e) { archives = []; }
+  try { projects = JSON.parse(localStorage.getItem(KEY_P) || '[]'); } catch(e) { projects = []; }
+  try { items = JSON.parse(localStorage.getItem(KEY_I) || '[]'); } catch(e) { items = []; }
+  try { pos = JSON.parse(localStorage.getItem(KEY_O) || '[]'); } catch(e) { pos = []; }
+}
+function persistAll() {
+  localStorage.setItem(KEY_ARCH, JSON.stringify(archives));
+  localStorage.setItem(KEY_P, JSON.stringify(projects));
+  localStorage.setItem(KEY_I, JSON.stringify(items));
+  localStorage.setItem(KEY_O, JSON.stringify(pos));
+}
+
+/* =========================================================
+   成本计算核心
+   ========================================================= */
+function calcItemCost(itemId) {
+  let total = 0;
+  pos.forEach(o => {
+    const ids = o.itemIds || [];
+    if (ids.includes(itemId) && ids.length > 0) {
+      total += (Number(o.amount) || 0) / ids.length;
+    }
+  });
+  return total;
+}
+
+function calcProjectCost(projectId) {
+  const its = items.filter(i => i.projectId === projectId);
+  return its.reduce((s, it) => s + calcItemCost(it.id), 0);
+}
+
+/* =========================================================
+   演示数据
+   ========================================================= */
+function seedAll() {
+  if (!archives.length && !projects.length) {
+    const pid = uid();
+    projects.push({ id: pid, name: 'XX医院机房设备采购项目', code: 'ZB-2026-018', status: '进行中', owner: '张工', note: '投标已中标，进入采购执行阶段', createdAt: new Date().toISOString() });
+    const i1 = uid(), i2 = uid(), i3 = uid();
+    items.push(
+      { id: i1, projectId: pid, name: '机架式服务器', spec: '2U / 64核 / 256G内存 / 2×960G SSD', qty: 2, unit: '台', price: 42000, note: '含3年原厂质保' },
+      { id: i2, projectId: pid, name: '核心交换机', spec: '48口千兆 + 4口万兆', qty: 1, unit: '台', price: 28000, note: '双电源' },
+      { id: i3, projectId: pid, name: '机柜及配套', spec: '42U标准机柜 / PDU / 理线架', qty: 1, unit: '套', price: 6500, note: '' }
+    );
+    pos.push(
+      { id: uid(), projectId: pid, no: 'PO-2026-1015-01', supplier: 'A科技有限公司', date: '2026-10-15', amount: 82000, status: '已下单', itemIds: [i1], note: '服务器2台，交货期15天' },
+      { id: uid(), projectId: pid, no: 'PO-2026-1018-02', supplier: 'B网络设备公司', date: '2026-10-18', amount: 34500, status: '已到货', itemIds: [i2, i3], note: '交换机+机柜配套，合并下单' }
+    );
+    archives.push(
+      { id: uid(), name: 'XX医院项目-招标文件', cat: 'bid-info', status: '已完成', related: '', date: '2026-10-20', amount: '', note: '报名截止10月28日，开标11月5日。', projectId: pid },
+      { id: uid(), name: '公司资质证书汇总（2026版）', cat: 'bid-qual', status: '已归档', related: '', date: '2026-10-15', amount: '', note: '含营业执照、ISO证书。', projectId: '' },
+      { id: uid(), name: 'XX项目投标文件（商务标+技术标）', cat: 'bid-doc', status: '已完成', related: '', date: '2026-10-18', amount: '', note: '已递交，保管期限：永久。', projectId: pid },
+      { id: uid(), name: '服务器采购申请单', cat: 'buy-plan', status: '待处理', related: '', date: '2026-10-22', amount: '85000', note: '2台机架式服务器，需3家比价。', projectId: pid },
+      { id: uid(), name: 'A公司服务器报价单', cat: 'buy-supplier', status: '进行中', related: 'A科技有限公司', date: '2026-10-21', amount: '82000', note: '含3年质保，交货期15天。', projectId: pid },
+      { id: uid(), name: '办公用品采购合同-晨光文具', cat: 'buy-contract', status: '已完成', related: '晨光文具', date: '2026-10-10', amount: '3200', note: 'A4纸10箱、签字笔200支。', projectId: '' },
+      { id: uid(), name: '公司印章使用登记表', cat: 'office-doc', status: '进行中', related: '', date: '2026-10-01', amount: '', note: '本月已用印5次。', projectId: '' },
+      { id: uid(), name: '10月部门例会纪要', cat: 'office-meet', status: '已完成', related: '', date: '2026-10-08', amount: '', note: '重点：Q4投标计划。', projectId: '' },
+      { id: uid(), name: '9月办公费报销汇总', cat: 'fee-daily', status: '已完成', related: '', date: '2026-09-30', amount: '4860', note: '办公用品2100、快递费680、印刷费1580。', projectId: '' },
+      { id: uid(), name: '10月出差-北京投标', cat: 'fee-travel', status: '待处理', related: '', date: '2026-10-25', amount: '2800', note: '高铁往返1200、住宿900。', projectId: '' }
+    );
+    persistAll();
+  }
+}
+
+/* =========================================================
+   模式切换
+   ========================================================= */
+function switchMode(m) {
+  mode = m;
+  document.getElementById('modeArchiveBtn').classList.toggle('active', m === 'archive');
+  document.getElementById('modeProjectBtn').classList.toggle('active', m === 'project');
+  document.getElementById('archiveNav').style.display = m === 'archive' ? 'block' : 'none';
+  document.getElementById('projectNav').style.display = m === 'project' ? 'block' : 'none';
+  document.getElementById('archiveTopbar').style.display = m === 'archive' ? 'block' : 'none';
+  document.getElementById('projectTopbar').style.display = m === 'project' ? 'block' : 'none';
+  if (m === 'archive') renderArchiveMode();
+  else renderProjectMode();
+}
+
+/* =========================================================
+   归档模式
+   ========================================================= */
+function switchArchiveCat(cat) {
+  currentCat = cat;
+  document.querySelectorAll('#archiveNav .nav-item').forEach(el => el.classList.toggle('active', el.dataset.cat === cat));
+  const cfg = cat === 'all' ? { name: '全部资料', desc: '所有分类的资料汇总' } : CATS[cat];
+  document.getElementById('arcCatTitle').textContent = cfg.name;
+  document.getElementById('arcCatDesc').textContent = cfg.desc;
+  renderArchiveCards();
+}
+
+function updateArchiveCounts() {
+  document.getElementById('countAll').textContent = archives.length;
+  const map = {
+    'bid-info':'countBidInfo','bid-qual':'countBidQual','bid-doc':'countBidDoc',
+    'buy-plan':'countBuyPlan','buy-supplier':'countBuySupplier','buy-contract':'countBuyContract',
+    'office-doc':'countOfficeDoc','office-meet':'countOfficeMeet','office-misc':'countOfficeMisc',
+    'fee-daily':'countFeeDaily','fee-travel':'countFeeTravel','fee-other':'countFeeOther'
+  };
+  Object.keys(map).forEach(cat => {
+    const el = document.getElementById(map[cat]);
+    if (el) el.textContent = archives.filter(i => i.cat === cat).length;
+  });
+}
+
+function renderArchiveMode() { updateArchiveCounts(); renderArchiveCards(); }
+
+function renderArchiveCards() {
+  const kw = document.getElementById('arcSearch').value.trim().toLowerCase();
+  let list = archives.slice();
+  if (currentCat !== 'all') list = list.filter(i => i.cat === currentCat);
+  if (kw) list = list.filter(i =>
+    (i.name||'').toLowerCase().includes(kw) ||
+    (i.note||'').toLowerCase().includes(kw) ||
+    (i.related||'').toLowerCase().includes(kw)
+  );
+  list.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+
+  const area = document.getElementById('contentArea');
+  if (!list.length) {
+    area.innerHTML = '<div class="empty">暂无资料，点右上角“＋ 新增资料”开始记录</div>';
+    return;
+  }
+
+  area.innerHTML = `<div class="card-grid">${list.map(i => {
+    const catCfg = CATS[i.cat] || { name: '未分类', icon: '📁' };
+    let badgeCls = 'badge-gray';
+    if (i.status === '已完成') badgeCls = 'badge-green';
+    else if (i.status === '进行中') badgeCls = 'badge-blue';
+    else if (i.status === '待处理') badgeCls = 'badge-amber';
+    const proj = i.projectId ? projects.find(p => p.id === i.projectId) : null;
+    return `<div class="card">
+      <div class="card-header">
+        <span class="card-title">${esc(i.name)}</span>
+        <span class="badge ${badgeCls}">${esc(i.status||'')}</span>
+      </div>
+      <div class="card-meta">
+        <span>${catCfg.icon} ${catCfg.name}</span>
+        ${i.related ? `<span>🔗 ${esc(i.related)}</span>` : ''}
+        ${i.date ? `<span>📅 ${esc(i.date)}</span>` : ''}
+        ${i.amount ? `<span>💰 ¥${fmt(i.amount)}</span>` : ''}
+      </div>
+      ${proj ? `<div style="margin-top:6px"><span class="tag tag-proj">📁 ${esc(proj.name)}</span></div>` : ''}
+      ${i.note ? `<div class="card-note">${esc(i.note).slice(0,90)}${i.note.length>90?'…':''}</div>` : ''}
+      <div class="card-actions">
+        <button class="btn btn-outline btn-sm" onclick="openArchiveModal('${i.id}')">编辑</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteArchive('${i.id}')">删除</button>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function openArchiveModal(id) {
+  const isEdit = !!id;
+  const a = isEdit ? archives.find(x => x.id === id) : null;
+  document.getElementById('archiveModalTitle').textContent = isEdit ? '编辑资料' : '新增资料';
+  document.getElementById('aEditId').value = id || '';
+  document.getElementById('aName').value = a ? a.name : '';
+  document.getElementById('aCat').value = a ? a.cat : (currentCat === 'all' ? 'bid-info' : currentCat);
+  document.getElementById('aStatus').value = a ? (a.status||'进行中') : '进行中';
+  document.getElementById('aDate').value = a ? (a.date||'') : new Date().toISOString().slice(0,10);
+  document.getElementById('aAmount').value = a ? (a.amount||'') : '';
+  document.getElementById('aRelated').value = a ? (a.related||'') : '';
+  document.getElementById('aNote').value = a ? (a.note||'') : '';
+  const sel = document.getElementById('aProject');
+  sel.innerHTML = '<option value="">不关联</option>' +
+    projects.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  sel.value = a ? (a.projectId||'') : '';
+  document.getElementById('archiveMask').classList.add('show');
+}
+
+function saveArchive() {
+  const name = document.getElementById('aName').value.trim();
+  if (!name) { alert('请填写资料名称'); return; }
+  const id = document.getElementById('aEditId').value;
+  const data = {
+    name,
+    cat: document.getElementById('aCat').value,
+    status: document.getElementById('aStatus').value,
+    projectId: document.getElementById('aProject').value,
+    date: document.getElementById('aDate').value,
+    amount: document.getElementById('aAmount').value,
+    related: document.getElementById('aRelated').value.trim(),
+    note: document.getElementById('aNote').value.trim()
+  };
+  if (id) Object.assign(archives.find(x => x.id === id), data);
+  else archives.push({ id: uid(), ...data, createdAt: new Date().toISOString() });
+  persistAll(); updateArchiveCounts(); renderArchiveCards(); closeMask('archiveMask');
+}
+
+function deleteArchive(id) {
+  if (!confirm('确定删除这条资料吗？')) return;
+  archives = archives.filter(i => i.id !== id);
+  persistAll(); updateArchiveCounts(); renderArchiveCards();
+}
+
+/* =========================================================
+   项目模式
+   ========================================================= */
+function renderProjectMode() {
+  renderProjectList();
+  if (currentProjectId && projects.find(p => p.id === currentProjectId)) {
+    selectProject(currentProjectId);
+  } else if (projects.length) {
+    selectProject(projects[0].id);
+  } else {
+    document.getElementById('projTitle').textContent = '请新建项目';
+    document.getElementById('projMeta').textContent = '';
+    document.getElementById('contentArea').innerHTML = '<div class="empty">还没有项目，点左侧“＋ 新建项目”开始</div>';
+  }
+}
+
+function renderProjectList() {
+  const el = document.getElementById('projectList');
+  if (!projects.length) {
+    el.innerHTML = '<div style="padding:16px;text-align:center;color:#64748b;font-size:11px">暂无项目</div>';
+    return;
+  }
+  el.innerHTML = projects.map(p => {
+    const its = items.filter(i => i.projectId === p.id);
+    const pcs = pos.filter(o => o.projectId === p.id);
+    const active = p.id === currentProjectId ? ' active' : '';
+    const cost = calcProjectCost(p.id);
+    return `<div class="project-item${active}" onclick="selectProject('${p.id}')">
+      <div class="pname">${esc(p.name)}</div>
+      <div class="pmeta">${esc(p.code||'无编号')} · ${esc(p.status)}</div>
+      <div class="pstats">${its.length} 单项 · ${pcs.length} 采购单 · 成本 ¥${fmt(cost)}</div>
+    </div>`;
+  }).join('');
+}
+
+function selectProject(id) {
+  currentProjectId = id;
+  const p = projects.find(x => x.id === id);
+  document.getElementById('projTitle').textContent = p ? p.name : '请选择项目';
+  document.getElementById('projMeta').textContent = p ? `${p.code||''} · ${p.status} · 负责人：${p.owner||'-'}` : '';
+  renderProjectList();
+  renderProjectContent();
+}
+
+function switchProjectTab(tab) {
+  currentProjectTab = tab;
+  document.querySelectorAll('#tabs .tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  renderProjectContent();
+}
+
+function renderProjectContent() {
+  if (!currentProjectId) {
+    document.getElementById('contentArea').innerHTML = '<div class="empty">请先在左侧选择或新建一个项目</div>';
+    return;
+  }
+  if (currentProjectTab === 'items') renderItemsTable();
+  else if (currentProjectTab === 'pos') renderPOTable();
+  else if (currentProjectTab === 'matrix') renderMatrix();
+  else renderProjectArchive();
+}
+
+/* ---------- 清单单项表格（含成本栏） ---------- */
+function renderItemsTable() {
+  const its = items.filter(i => i.projectId === currentProjectId);
+  const pcs = pos.filter(o => o.projectId === currentProjectId);
+  const totalBudget = its.reduce((s,i) => s + (Number(i.qty)||0) * (Number(i.price)||0), 0);
+  const totalCost = its.reduce((s,i) => s + calcItemCost(i.id), 0);
+  const totalDiff = totalBudget - totalCost;
+
+  let html = `<div class="summary">
+    <div class="box">清单单项<b>${its.length}</b></div>
+    <div class="box">预算合计<b>¥${fmt(totalBudget)}</b></div>
+    <div class="box">已采购成本<b>¥${fmt(totalCost)}</b></div>
+    <div class="box">预算结余<b class="${totalDiff>=0?'diff-under':'diff-over'}">¥${fmt(totalDiff)}</b></div>
+    <div class="box">关联采购单<b>${pcs.length}</b></div>
+  </div>`;
+
+  if (!its.length) {
+    html += '<div class="empty">还没有清单单项，点右上角“＋ 清单单项”添加</div>';
+    document.getElementById('contentArea').innerHTML = html;
+    return;
+  }
+
+  html += `<table><thead><tr>
+    <th style="width:24%">单项名称</th><th>规格/型号</th><th>数量</th><th>预算单价</th>
+    <th>预算小计</th><th>已采购成本</th><th>预算结余</th><th style="width:18%">关联采购单</th><th style="width:100px">操作</th>
+  </tr></thead><tbody>`;
+
+  its.forEach(it => {
+    const linked = pcs.filter(o => (o.itemIds||[]).includes(it.id));
+    const linkedHtml = linked.length
+      ? linked.map(o => `<span class="tag tag-po" title="${esc(o.supplier||'')}">${esc(o.no)}</span>`).join('')
+      : '<span class="tag tag-none">未关联</span>';
+    const budgetSub = (Number(it.qty)||0) * (Number(it.price)||0);
+    const cost = calcItemCost(it.id);
+    const diff = budgetSub - cost;
+    const diffCls = diff >= 0 ? 'diff-under' : 'diff-over';
+    html += `<tr>
+      <td><b>${esc(it.name)}</b>${it.note?`<div style="color:#9ca3af;font-size:11px;margin-top:2px">${esc(it.note).slice(0,40)}</div>`:''}</td>
+      <td>${esc(it.spec||'-')}</td>
+      <td>${it.qty||0} ${esc(it.unit||'')}</td>
+      <td class="amount">¥${fmt(it.price)}</td>
+      <td class="amount">¥${fmt(budgetSub)}</td>
+      <td class="amount cost">¥${fmt(cost)}</td>
+      <td class="amount ${diffCls}">¥${fmt(diff)}</td>
+      <td>${linkedHtml}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="openItemModal('${it.id}')">编辑</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteItem('${it.id}')">删</button>
+      </td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  html += '<div class="hint">“已采购成本”自动汇总自关联的采购单金额。一张采购单关联多个单项时，金额按单项数量均摊。预算结余 = 预算小计 − 已采购成本，负数红色表示超预算。</div>';
+  document.getElementById('contentArea').innerHTML = html;
+}
+
+/* ---------- 采购单表格 ---------- */
+function renderPOTable() {
+  const pcs = pos.filter(o => o.projectId === currentProjectId);
+  const its = items.filter(i => i.projectId === currentProjectId);
+  const total = pcs.reduce((s,o) => s + (Number(o.amount)||0), 0);
+
+  let html = `<div class="summary">
+    <div class="box">采购单<b>${pcs.length}</b></div>
+    <div class="box">采购金额合计<b>¥${fmt(total)}</b></div>
+  </div>`;
+
+  if (!pcs.length) {
+    html += '<div class="empty">还没有采购单，点右上角“＋ 采购单”添加</div>';
+    document.getElementById('contentArea').innerHTML = html;
+    return;
+  }
+
+  html += `<table><thead><tr>
+    <th>采购单号</th><th>供应商</th><th>日期</th><th>金额</th><th>状态</th>
+    <th style="width:26%">关联清单单项（均摊）</th><th style="width:100px">操作</th>
+  </tr></thead><tbody>`;
+
+  pcs.forEach(o => {
+    const linked = (o.itemIds||[]).map(iid => its.find(x => x.id === iid)).filter(Boolean);
+    const share = linked.length ? (Number(o.amount)||0) / linked.length : 0;
+    const linkedHtml = linked.length
+      ? linked.map(x => `<span class="tag">${esc(x.name)} <span style="color:#9ca3af">¥${fmt(share)}</span></span>`).join('')
+      : '<span class="tag tag-none">未关联</span>';
+    const stCls = o.status === '已验收' || o.status === '已付款' ? 'status-done' : 'status-pending';
+    html += `<tr>
+      <td><b>${esc(o.no)}</b></td>
+      <td>${esc(o.supplier||'-')}</td>
+      <td>${esc(o.date||'-')}</td>
+      <td class="amount">¥${fmt(o.amount)}</td>
+      <td class="${stCls}">${esc(o.status||'-')}</td>
+      <td>${linkedHtml}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="openPOModal('${o.id}')">编辑</button>
+        <button class="btn btn-danger btn-sm" onclick="deletePO('${o.id}')">删</button>
+      </td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  document.getElementById('contentArea').innerHTML = html;
+}
+
+/* ---------- 关联总览（含成本分布） ---------- */
+function renderMatrix() {
+  const its = items.filter(i => i.projectId === currentProjectId);
+  const pcs = pos.filter(o => o.projectId === currentProjectId);
+  if (!its.length || !pcs.length) {
+    document.getElementById('contentArea').innerHTML = '<div class="empty">需要同时有清单单项和采购单，才能看到关联总览</div>';
+    return;
+  }
+  const totalCost = its.reduce((s,i) => s + calcItemCost(i.id), 0);
+  let html = `<div class="summary">
+    <div class="box">单项<b>${its.length}</b></div>
+    <div class="box">采购单<b>${pcs.length}</b></div>
+    <div class="box">已关联单项<b>${its.filter(it => pcs.some(o => (o.itemIds||[]).includes(it.id))).length}</b></div>
+    <div class="box">成本合计<b>¥${fmt(totalCost)}</b></div>
+  </div>`;
+  html += `<table><thead><tr><th style="width:20%">清单单项</th>`;
+  pcs.forEach(o => { html += `<th style="text-align:center;font-size:10px">${esc(o.no)}<br><span style="font-weight:400;color:#9ca3af">¥${fmt(o.amount)}</span></th>`; });
+  html += `<th>该项成本合计</th></tr></thead><tbody>`;
+  its.forEach(it => {
+    const linked = pcs.filter(o => (o.itemIds||[]).includes(it.id));
+    html += `<tr><td><b>${esc(it.name)}</b><div style="color:#9ca3af;font-size:11px">${esc(it.spec||'')}</div></td>`;
+    pcs.forEach(o => {
+      const hit = (o.itemIds||[]).includes(it.id);
+      if (hit) {
+        const share = (Number(o.amount)||0) / (o.itemIds||[]).length;
+        html += `<td style="text-align:center"><span style="color:#15803d;font-weight:700">✓</span><div style="font-size:10px;color:#b45309">¥${fmt(share)}</div></td>`;
+      } else {
+        html += `<td style="text-align:center"><span style="color:#e5e7eb">—</span></td>`;
+      }
+    });
+    const cost = calcItemCost(it.id);
+    html += `<td class="amount cost">¥${fmt(cost)}</td></tr>`;
+  });
+  html += '</tbody></table><div class="hint">✓ 表示该采购单包含此清单单项，下方小字为该采购单均摊到本单项的金额。</div>';
+  document.getElementById('contentArea').innerHTML = html;
+}
+
+/* ---------- 项目关联资料 ---------- */
+function renderProjectArchive() {
+  const list = archives.filter(a => a.projectId === currentProjectId);
+  if (!list.length) {
+    document.getElementById('contentArea').innerHTML = '<div class="empty">该项目还没有关联的归档资料。<br>到“资料归档”模式编辑资料，在“关联项目”里选择本项目即可。</div>';
+    return;
+  }
+  let html = `<div class="summary"><div class="box">关联资料<b>${list.length}</b></div></div>`;
+  html += `<table><thead><tr><th style="width:30%">资料名称</th><th>分类</th><th>状态</th><th>日期</th><th>金额</th><th style="width:100px">操作</th></tr></thead><tbody>`;
+  list.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  list.forEach(a => {
+    const catCfg = CATS[a.cat] || { name: '未分类', icon: '📁' };
+    const stCls = a.status === '已完成' ? 'status-done' : (a.status === '待处理' ? 'status-pending' : '');
+    html += `<tr>
+      <td><b>${esc(a.name)}</b></td>
+      <td>${catCfg.icon} ${catCfg.name}</td>
+      <td class="${stCls}">${esc(a.status||'-')}</td>
+      <td>${esc(a.date||'-')}</td>
+      <td class="amount">${a.amount ? '¥'+fmt(a.amount) : '-'}</td>
+      <td><button class="btn btn-outline btn-sm" onclick="openArchiveModal('${a.id}')">编辑</button></td>
+    </tr>`;
+  });
+  html += '</tbody></table><div class="hint">资料在“资料归档”模式下统一管理，这里只显示关联了当前项目的资料。</div>';
+  document.getElementById('contentArea').innerHTML = html;
+}
+
+/* =========================================================
+   项目增删改
+   ========================================================= */
+function openProjectModal(id) {
+  const isEdit = !!id;
+  const p = isEdit ? projects.find(x => x.id === id) : null;
+  document.getElementById('projectModalTitle').textContent = isEdit ? '编辑项目' : '新建项目';
+  document.getElementById('pEditId').value = id || '';
+  document.getElementById('pName').value = p ? p.name : '';
+  document.getElementById('pCode').value = p ? (p.code||'') : '';
+  document.getElementById('pStatus').value = p ? (p.status||'进行中') : '进行中';
+  document.getElementById('pOwner').value = p ? (p.owner||'') : '';
+  document.getElementById('pNote').value = p ? (p.note||'') : '';
+  document.getElementById('projectMask').classList.add('show');
+}
+
+function saveProject() {
+  const name = document.getElementById('pName').value.trim();
+  if (!name) { alert('请填写项目名称'); return; }
+  const id = document.getElementById('pEditId').value;
+  const data = {
+    name,
+    code: document.getElementById('pCode').value.trim(),
+    status: document.getElementById('pStatus').value,
+    owner: document.getElementById('pOwner').value.trim(),
+    note: document.getElementById('pNote').value.trim()
+  };
+  if (id) Object.assign(projects.find(x => x.id === id), data);
+  else {
+    const pid = uid();
+    projects.push({ id: pid, ...data, createdAt: new Date().toISOString() });
+    currentProjectId = pid;
+  }
+  persistAll(); renderProjectList(); selectProject(currentProjectId); closeMask('projectMask');
+}
+
+function editProject() {
+  if (!currentProjectId) return alert('请先选择项目');
+  openProjectModal(currentProjectId);
+}
+
+function deleteProject() {
+  if (!currentProjectId) return alert('请先选择项目');
+  const p = projects.find(x => x.id === currentProjectId);
+  if (!confirm(`确定删除项目「${p.name}」吗？\n该项目下的清单单项和采购单也会一并删除。归档资料不会被删除，但会解除与本项目的关联。`)) return;
+  items = items.filter(i => i.projectId !== currentProjectId);
+  pos = pos.filter(o => o.projectId !== currentProjectId);
+  archives.forEach(a => { if (a.projectId === currentProjectId) a.projectId = ''; });
+  projects = projects.filter(x => x.id !== currentProjectId);
+  currentProjectId = null;
+  persistAll(); renderProjectMode();
+}
+
+/* =========================================================
+   清单单项增删改
+   ========================================================= */
+function openItemModal(id) {
+  if (!currentProjectId) return alert('请先选择项目');
+  const isEdit = !!id;
+  const it = isEdit ? items.find(x => x.id === id) : null;
+  document.getElementById('itemModalTitle').textContent = isEdit ? '编辑清单单项' : '新增清单单项';
+  document.getElementById('iEditId').value = id || '';
+  document.getElementById('iName').value = it ? it.name : '';
+  document.getElementById('iSpec').value = it ? (it.spec||'') : '';
+  document.getElementById('iQty').value = it ? (it.qty||1) : 1;
+  document.getElementById('iUnit').value = it ? (it.unit||'') : '';
+  document.getElementById('iPrice').value = it ? (it.price||'') : '';
+  document.getElementById('iNote').value = it ? (it.note||'') : '';
+  document.getElementById('itemMask').classList.add('show');
+}
+
+function saveItem() {
+  const name = document.getElementById('iName').value.trim();
+  if (!name) { alert('请填写单项名称'); return; }
+  const id = document.getElementById('iEditId').value;
+  const data = {
+    projectId: currentProjectId,
+    name,
+    spec: document.getElementById('iSpec').value.trim(),
+    qty: Number(document.getElementById('iQty').value) || 0,
+    unit: document.getElementById('iUnit').value.trim(),
+    price: Number(document.getElementById('iPrice').value) || 0,
+    note: document.getElementById('iNote').value.trim()
+  };
+  if (id) Object.assign(items.find(x => x.id === id), data);
+  else items.push({ id: uid(), ...data });
+  persistAll(); renderProjectList(); renderProjectContent(); closeMask('itemMask');
+}
+
+function deleteItem(id) {
+  const linkedPOs = pos.filter(o => (o.itemIds||[]).includes(id));
+  let msg = '确定删除这个清单单项吗？';
+  if (linkedPOs.length) msg += `\n注意：有 ${linkedPOs.length} 张采购单关联了它，删除后这些采购单上的该项关联会被移除，成本会重新分摊。`;
+  if (!confirm(msg)) return;
+  items = items.filter(i => i.id !== id);
+  pos.forEach(o => { o.itemIds = (o.itemIds||[]).filter(x => x !== id); });
+  persistAll(); renderProjectList(); renderProjectContent();
+}
+
+/* =========================================================
+   采购单增删改
+   ========================================================= */
+function openPOModal(id) {
+  if (!currentProjectId) return alert('请先选择项目');
+  const isEdit = !!id;
+  const o = isEdit ? pos.find(x => x.id === id) : null;
+  document.getElementById('poModalTitle').textContent = isEdit ? '编辑采购单' : '新增采购单';
+  document.getElementById('poEditId').value = id || '';
+  document.getElementById('poNo').value = o ? o.no : '';
+  document.getElementById('poSupplier').value = o ? (o.supplier||'') : '';
+  document.getElementById('poDate').value = o ? (o.date||'') : new Date().toISOString().slice(0,10);
+  document.getElementById('poAmount').value = o ? (o.amount||'') : '';
+  document.getElementById('poStatus').value = o ? (o.status||'待审批') : '待审批';
+  document.getElementById('poNote').value = o ? (o.note||'') : '';
+
+  const its = items.filter(i => i.projectId === currentProjectId);
+  const sel = o ? (o.itemIds||[]) : [];
+  const cl = document.getElementById('itemCheckList');
+  if (!its.length) {
+    cl.innerHTML = '<div style="padding:10px;color:#9ca3af;font-size:12px">当前项目还没有清单单项，请先添加</div>';
+  } else {
+    cl.innerHTML = its.map(it => `<label class="check-item">
+      <input type="checkbox" value="${it.id}" ${sel.includes(it.id)?'checked':''}>
+      <span class="ci-name">${esc(it.name)}</span>
+      <span class="ci-spec">${esc(it.spec||'')} × ${it.qty||0}${esc(it.unit||'')}</span>
+    </label>`).join('');
+  }
+  document.getElementById('poMask').classList.add('show');
+}
+
+function savePO() {
+  const no = document.getElementById('poNo').value.trim();
+  if (!no) { alert('请填写采购单号'); return; }
+  const checked = [...document.querySelectorAll('#itemCheckList input:checked')].map(x => x.value);
+  if (!checked.length) { alert('请至少勾选一个关联清单单项'); return; }
+  const id = document.getElementById('poEditId').value;
+  const data = {
+    projectId: currentProjectId,
+    no,
+    supplier: document.getElementById('poSupplier').value.trim(),
+    date: document.getElementById('poDate').value,
+    amount: Number(document.getElementById('poAmount').value) || 0,
+    status: document.getElementById('poStatus').value,
+    itemIds: checked,
+    note: document.getElementById('poNote').value.trim()
+  };
+  if (id) Object.assign(pos.find(x => x.id === id), data);
+  else pos.push({ id: uid(), ...data });
+  persistAll(); renderProjectList(); renderProjectContent(); closeMask('poMask');
+}
+
+function deletePO(id) {
+  if (!confirm('确定删除这张采购单吗？清单单项本身不会被删除，成本会重新计算。')) return;
+  pos = pos.filter(o => o.id !== id);
+  persistAll(); renderProjectList(); renderProjectContent();
+}
+
+function closeMask(id) { document.getElementById(id).classList.remove('show'); }
+
+/* =========================================================
+   初始化
+   ========================================================= */
+loadAll();
+seedAll();
+switchMode('archive');
+</script>
+</body>
+</html>
