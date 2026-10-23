@@ -2,233 +2,267 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<!-- 确保移动端按设备真实宽度渲染，禁止缩放 -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>J21的牛马日记</title>
+<title>蒋哲的工作日记 🦖</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap');
+  /* ================= 梦幻字体与核心变量 ================= */
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap');
 
   :root {
-    --bg-main: #e0f7ea; --bg-panel: #ffffff; --primary: #2dd4bf; --primary-hover: #14b8a6;
-    --text-main: #064e3b; --text-muted: #64748b; --border: #d1fae5;
+    --bg-base: #e8f8f5;
+    --glass-bg: rgba(255, 255, 255, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.9);
+    --primary: #20b2aa; /* 浅海洋绿 */
+    --primary-light: #48d1cc;
+    --primary-dark: #008b8b;
+    --accent-pink: #ffb6c1;
+    --accent-yellow: #fffacd;
+    --text-main: #2c3e50;
+    --text-muted: #7f8c8d;
+    --shadow-soft: 0 8px 32px 0 rgba(32, 178, 170, 0.15);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  
   body {
     font-family: 'Nunito', "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: var(--bg-main);
-    background-image: radial-gradient(#a7f3d0 1px, transparent 1px);
-    background-size: 20px 20px; color: var(--text-main); height: 100vh; display: flex; overflow: hidden;
+    color: var(--text-main); height: 100vh; display: flex; overflow: hidden;
+    /* 梦幻动态渐变背景 */
+    background: linear-gradient(-45deg, #e0f7fa, #e8f8f5, #f0fdf4, #fef0f0);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+  }
+  @keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
 
   /* ================= 欢迎登录页 ================= */
   .welcome-screen {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(135deg, #6ee7b7 0%, #34d399 50%, #10b981 100%);
+    background: radial-gradient(circle at center, #a8edea 0%, #fed6e3 100%);
     z-index: 9999; display: flex; align-items: center; justify-content: center;
     transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden;
   }
-  .bg-bubble { position: absolute; background: rgba(255,255,255,0.4); border-radius: 50%; filter: blur(2px); animation: floatUp 10s infinite linear; }
-  @keyframes floatUp { 0% { transform: translateY(100vh) scale(0.5); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(-20vh) scale(1.5); opacity: 0; } }
+  
+  /* 漂浮的泡泡 */
+  .bg-bubble { position: absolute; background: rgba(255,255,255,0.5); border-radius: 50%; filter: blur(1px); animation: floatUp 8s infinite linear; box-shadow: inset -5px -5px 15px rgba(255,255,255,0.8), inset 5px 5px 15px rgba(0,0,0,0.05); }
+  @keyframes floatUp { 0% { transform: translateY(100vh) scale(0.5); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(-20vh) scale(1.2); opacity: 0; } }
+  
   .welcome-card {
-    background: rgba(255, 255, 255, 0.95); border: 4px dashed #34d399; padding: 40px 50px;
-    border-radius: 30px; box-shadow: 0 20px 50px rgba(16, 185, 129, 0.3); text-align: center; position: relative;
+    background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px);
+    border: 3px solid #fff; padding: 45px 50px;
+    border-radius: 40px; box-shadow: 0 20px 60px rgba(255, 182, 193, 0.4);
+    text-align: center; position: relative;
     transform: scale(0.5) translateY(100px); opacity: 0; animation: popInBounce 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; animation-delay: 0.2s; z-index: 2;
-    width: 90%; max-width: 400px;
+    width: 90%; max-width: 420px;
   }
   @keyframes popInBounce { 0% { transform: scale(0.5) translateY(100px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
-  .dino-mascot { font-size: 70px; margin-bottom: -15px; display: inline-block; animation: jump 1.5s infinite ease-in-out; transform-origin: bottom center; }
-  @keyframes jump { 0%, 100% { transform: translateY(0) scale(1, 1); } 50% { transform: translateY(-15px) scale(1.05, 0.95); } }
-  .welcome-title { font-size: 24px; font-weight: 800; color: #059669; margin-bottom: 10px; letter-spacing: 1px; text-shadow: 2px 2px 0px #d1fae5; }
-  .welcome-subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 30px; font-weight: 600; }
-  /* 手机端输入框字体至少16px防自动放大 */
-  .login-input { width: 100%; padding: 14px 16px; border: 3px solid #a7f3d0; border-radius: 16px; font-size: 16px; outline: none; margin-bottom: 20px; text-align: center; font-family: inherit; font-weight: 700; color: #047857; background: #f0fdf4; transition: all 0.3s; }
-  .login-input:focus { border-color: #10b981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); transform: scale(1.02); }
-  .login-btn { width: 100%; padding: 15px; background: linear-gradient(to right, #34d399, #10b981); color: #fff; border: none; border-radius: 16px; font-size: 18px; font-weight: 800; cursor: pointer; transition: all 0.3s; box-shadow: 0 6px 0 #047857; font-family: inherit; letter-spacing: 1px; }
-  .login-btn:hover { transform: translateY(2px); box-shadow: 0 4px 0 #047857; }
-  .login-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #047857; }
+  
+  .dino-mascot { font-size: 80px; margin-bottom: -15px; display: inline-block; animation: jump 1.5s infinite ease-in-out; transform-origin: bottom center; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1)); }
+  @keyframes jump { 0%, 100% { transform: translateY(0) scale(1, 1); } 50% { transform: translateY(-20px) scale(1.05, 0.95); } }
+  
+  .welcome-title { font-size: 28px; font-weight: 900; color: var(--primary-dark); margin-bottom: 10px; letter-spacing: 2px; }
+  .welcome-subtitle { font-size: 15px; color: var(--text-muted); margin-bottom: 30px; font-weight: 600; }
+  
+  .login-input { width: 100%; padding: 16px; border: 3px solid #e0f2f1; border-radius: 20px; font-size: 16px; outline: none; margin-bottom: 20px; text-align: center; font-family: inherit; font-weight: 800; color: var(--primary-dark); background: #f8fafc; transition: all 0.3s; }
+  .login-input:focus { border-color: var(--primary-light); box-shadow: 0 0 20px rgba(72, 209, 204, 0.4); background: #fff; transform: scale(1.02); }
+  
+  .login-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #48d1cc, #20b2aa); color: #fff; border: none; border-radius: 20px; font-size: 18px; font-weight: 900; cursor: pointer; transition: all 0.3s; box-shadow: 0 8px 0 var(--primary-dark), 0 15px 20px rgba(32, 178, 170, 0.3); font-family: inherit; letter-spacing: 1px; }
+  .login-btn:hover { transform: translateY(2px); box-shadow: 0 6px 0 var(--primary-dark), 0 10px 15px rgba(32, 178, 170, 0.3); }
+  .login-btn:active { transform: translateY(8px); box-shadow: 0 0 0 var(--primary-dark), 0 5px 10px rgba(32, 178, 170, 0.3); }
   .welcome-screen.hidden { opacity: 0; pointer-events: none; }
 
   /* ================= 主系统布局 ================= */
-  .sidebar { width: 260px; background: #ffffff; border-right: 3px solid var(--border); color: var(--text-main); flex-shrink: 0; display: flex; flex-direction: column; overflow-y: auto; box-shadow: 4px 0 15px rgba(0,0,0,0.02); }
-  .sidebar h1 { font-size: 16px; color: #059669; padding: 20px 14px; border-bottom: 2px dashed var(--border); font-weight: 800; text-align: center; white-space: nowrap; }
-  .mode-switch { display: flex; padding: 15px 12px 8px; gap: 8px; }
-  .mode-btn { flex: 1; padding: 10px 6px; font-size: 13px; text-align: center; cursor: pointer; border-radius: 12px; background: #f0fdf4; color: #059669; transition: all .2s; border: 2px solid transparent; font-family: inherit; font-weight: 800; white-space: nowrap; }
-  .mode-btn:hover { background: #d1fae5; }
-  .mode-btn.active { background: #34d399; color: #fff; box-shadow: 0 4px 0 #059669; border-color: #34d399; }
+  /* 毛玻璃侧边栏 */
+  .sidebar { width: 270px; background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-right: 2px solid var(--glass-border); color: var(--text-main); flex-shrink: 0; display: flex; flex-direction: column; overflow-y: auto; box-shadow: 4px 0 24px rgba(0,0,0,0.03); z-index: 10; position: relative; }
+  .sidebar h1 { font-size: 18px; color: var(--primary-dark); padding: 24px 20px; border-bottom: 2px dashed rgba(32, 178, 170, 0.2); font-weight: 900; text-align: center; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 8px; }
   
-  .nav-group { padding: 4px 0; }
-  .nav-group-title { font-size: 11px; color: #6ee7b7; padding: 12px 16px 6px; font-weight: 800; letter-spacing: 1px; white-space: nowrap; }
-  .nav-item { padding: 10px 16px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; margin: 2px 10px; border-radius: 10px; transition: all .15s; color: #475569; white-space: nowrap; }
-  .nav-item:hover { background: #f0fdf4; color: #059669; transform: translateX(3px); }
-  .nav-item.active { background: #ecfdf5; color: #10b981; border-left: 4px solid #10b981; font-weight: 800; }
-  .nav-item .icon { font-size: 16px; }
-  .nav-item .count { margin-left: auto; font-size: 11px; background: #34d399; color: #fff; padding: 2px 8px; border-radius: 12px; font-weight: 800; }
-
-  .project-item { padding: 12px 14px; border-radius: 12px; cursor: pointer; margin: 4px 10px; transition: all .15s; background: #f8fafc; border: 2px solid transparent; }
-  .project-item:hover { background: #f0fdf4; border-color: #a7f3d0; transform: scale(1.02); }
-  .project-item.active { background: #ecfdf5; border-color: #34d399; box-shadow: 0 4px 10px rgba(52, 211, 153, 0.2); }
-  .project-item .pname { font-size: 13px; color: #065f46; font-weight: 800; margin-bottom: 4px; }
-  .project-item .pmeta { font-size: 11px; color: #64748b; font-weight: 600; }
-  .project-item .pstats { font-size: 11px; color: #10b981; margin-top: 6px; font-weight: 800; background: #d1fae5; display: inline-block; padding: 2px 8px; border-radius: 6px; }
+  .mode-switch { display: flex; padding: 15px 15px 10px; gap: 10px; }
+  .mode-btn { flex: 1; padding: 12px 8px; font-size: 13px; text-align: center; cursor: pointer; border-radius: 14px; background: #fff; color: var(--primary-dark); transition: all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid #e0f2f1; font-family: inherit; font-weight: 800; white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+  .mode-btn:hover { background: #f0fdf4; transform: translateY(-2px); }
+  .mode-btn.active { background: linear-gradient(135deg, #48d1cc, #20b2aa); color: #fff; box-shadow: 0 6px 15px rgba(32, 178, 170, 0.3); border-color: transparent; transform: scale(1.05); }
   
-  .sidebar-btn-wrap { padding: 12px; margin-top: auto; }
-  .sidebar-btn-wrap .btn { width: 100%; padding: 12px; border-radius: 12px; font-size: 14px; }
+  .nav-group { padding: 6px 0; }
+  .nav-group-title { font-size: 12px; color: var(--primary-light); padding: 14px 20px 6px; font-weight: 900; letter-spacing: 1px; white-space: nowrap; }
+  .nav-item { padding: 12px 18px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 12px; margin: 4px 12px; border-radius: 14px; transition: all .2s; color: var(--text-muted); white-space: nowrap; border: 2px solid transparent; }
+  .nav-item:hover { background: rgba(255,255,255,0.8); color: var(--primary); transform: translateX(5px); }
+  .nav-item.active { background: #fff; color: var(--primary-dark); border-color: var(--primary-light); box-shadow: 0 4px 15px rgba(32, 178, 170, 0.1); font-weight: 900; }
+  .nav-item .icon { font-size: 18px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1)); }
+  .nav-item .count { margin-left: auto; font-size: 12px; background: var(--primary-light); color: #fff; padding: 2px 10px; border-radius: 12px; font-weight: 900; }
 
-  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; width: 100%; }
-  .topbar { background: #ffffff; border-bottom: 3px solid var(--border); padding: 14px 22px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; box-shadow: 0 4px 10px rgba(0,0,0,0.02); z-index: 10; }
-  .topbar h2 { font-size: 18px; font-weight: 800; color: #059669; margin-right: auto; }
-  .topbar .sub { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+  .project-item { padding: 14px 16px; border-radius: 16px; cursor: pointer; margin: 6px 12px; transition: all .2s cubic-bezier(0.175, 0.885, 0.32, 1.275); background: #fff; border: 2px solid #f0fdf4; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+  .project-item:hover { background: #f8fafc; border-color: var(--primary-light); transform: scale(1.03) translateY(-2px); box-shadow: 0 8px 20px rgba(32, 178, 170, 0.15); }
+  .project-item.active { background: #f0fdfa; border-color: var(--primary); box-shadow: 0 8px 20px rgba(32, 178, 170, 0.2); }
+  .project-item .pname { font-size: 14px; color: var(--primary-dark); font-weight: 900; margin-bottom: 6px; }
+  .project-item .pmeta { font-size: 12px; color: var(--text-muted); font-weight: 700; }
+  .project-item .pstats { font-size: 12px; color: var(--primary-dark); margin-top: 8px; font-weight: 900; background: #e0f2f1; display: inline-block; padding: 4px 10px; border-radius: 8px; }
+  
+  .sidebar-btn-wrap { padding: 15px; margin-top: auto; }
+  .sidebar-btn-wrap .btn { width: 100%; padding: 14px; border-radius: 16px; font-size: 15px; }
 
-  .btn { padding: 8px 16px; border: none; border-radius: 10px; cursor: pointer; font-size: 13px; font-family: inherit; font-weight: 800; transition: all .2s; white-space: nowrap; }
-  .btn-primary { background: #34d399; color: #fff; box-shadow: 0 3px 0 #059669; }
-  .btn-primary:hover { background: #10b981; transform: translateY(1px); box-shadow: 0 2px 0 #059669; }
-  .btn-outline { background: #fff; border: 2px solid #a7f3d0; color: #059669; }
-  .btn-outline:hover { background: #ecfdf5; border-color: #34d399; }
-  .btn-danger { background: #fff; border: 2px solid #fca5a5; color: #ef4444; }
-  .btn-danger:hover { background: #fef2f2; }
-  .btn-sm { padding: 5px 10px; font-size: 12px; }
-  .btn-green { background: #10b981; color: #fff; box-shadow: 0 3px 0 #047857; }
-  .btn-green:hover { background: #059669; transform: translateY(1px); box-shadow: 0 2px 0 #047857; }
+  /* 可爱小恐龙IP */
+  .pet-dino {
+    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+    font-size: 50px; cursor: pointer; transition: all 0.3s;
+    animation: petIdle 3s infinite ease-in-out; z-index: 100;
+    filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1));
+  }
+  .pet-dino:hover { transform: translateX(-50%) scale(1.2) rotate(10deg); animation: none; }
+  @keyframes petIdle { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-10px); } }
 
-  .tabs { display: flex; gap: 6px; padding: 12px 22px 0; background: #ffffff; border-bottom: 3px solid var(--border); overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; width: 100%; position: relative; }
+  
+  /* 顶部栏 */
+  .topbar { background: var(--glass-bg); backdrop-filter: blur(20px); border-bottom: 2px solid var(--glass-border); padding: 16px 26px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; box-shadow: 0 4px 20px rgba(0,0,0,0.02); z-index: 10; border-radius: 0 0 24px 24px; margin-bottom: 10px; }
+  .topbar h2 { font-size: 20px; font-weight: 900; color: var(--primary-dark); margin-right: auto; display: flex; align-items: center; gap: 8px; }
+  .topbar .sub { font-size: 13px; font-weight: 700; color: var(--text-muted); background: #fff; padding: 4px 12px; border-radius: 10px; }
+
+  .btn { padding: 10px 18px; border: none; border-radius: 14px; cursor: pointer; font-size: 14px; font-family: inherit; font-weight: 900; transition: all .2s cubic-bezier(0.175, 0.885, 0.32, 1.275); white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+  .btn-primary { background: linear-gradient(135deg, #48d1cc, #20b2aa); color: #fff; box-shadow: 0 4px 0 var(--primary-dark), 0 6px 15px rgba(32, 178, 170, 0.3); }
+  .btn-primary:hover { transform: translateY(2px); box-shadow: 0 2px 0 var(--primary-dark), 0 4px 10px rgba(32, 178, 170, 0.3); }
+  .btn-primary:active { transform: translateY(4px); box-shadow: 0 0 0 var(--primary-dark); }
+  
+  .btn-outline { background: #fff; border: 2px solid #e0f2f1; color: var(--primary-dark); box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+  .btn-outline:hover { background: #f0fdf4; border-color: var(--primary-light); transform: translateY(-2px); }
+  .btn-danger { background: #fff; border: 2px solid #fca5a5; color: #ef4444; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.1); }
+  .btn-danger:hover { background: #fef2f2; transform: translateY(-2px); }
+  .btn-green { background: linear-gradient(135deg, #34d399, #10b981); color: #fff; box-shadow: 0 4px 0 #047857, 0 6px 15px rgba(16, 185, 129, 0.3); }
+  .btn-green:hover { transform: translateY(2px); box-shadow: 0 2px 0 #047857; }
+  .btn-sm { padding: 6px 12px; font-size: 13px; border-radius: 10px; }
+
+  /* 选项卡 */
+  .tabs { display: flex; gap: 8px; padding: 15px 26px 0; background: transparent; overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .tabs::-webkit-scrollbar { display: none; }
-  .tab { padding: 10px 20px; font-size: 13px; font-weight: 800; cursor: pointer; color: #64748b; border-radius: 12px 12px 0 0; transition: all .2s; background: #f1f5f9; white-space: nowrap; }
-  .tab:hover { color: #059669; background: #ecfdf5; }
-  .tab.active { color: #fff; background: #34d399; }
+  .tab { padding: 12px 24px; font-size: 14px; font-weight: 900; cursor: pointer; color: var(--text-muted); border-radius: 16px 16px 0 0; transition: all .3s; background: rgba(255,255,255,0.6); white-space: nowrap; border: 2px solid transparent; border-bottom: none; }
+  .tab:hover { color: var(--primary-dark); background: #fff; }
+  .tab.active { color: var(--primary-dark); background: #fff; box-shadow: 0 -4px 15px rgba(0,0,0,0.03); border-color: var(--glass-border); border-bottom: 2px solid #fff; }
 
-  .content { flex: 1; overflow-y: auto; padding: 20px 22px; -webkit-overflow-scrolling: touch; }
+  .content { flex: 1; overflow-y: auto; padding: 10px 26px 30px; -webkit-overflow-scrolling: touch; }
 
-  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
-  .card { background: #fff; border: 3px solid var(--border); border-radius: 16px; padding: 16px; transition: all .2s; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
-  .card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(52, 211, 153, 0.15); border-color: #6ee7b7; }
-  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; gap: 8px; }
-  .card-title { font-size: 15px; font-weight: 800; color: #065f46; }
+  /* 卡片 */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+  .card { background: #fff; border: 2px solid var(--glass-border); border-radius: 20px; padding: 20px; transition: all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: var(--shadow-soft); position: relative; overflow: hidden; }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #48d1cc, #ffb6c1); opacity: 0; transition: opacity 0.3s; }
+  .card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 15px 35px rgba(32, 178, 170, 0.2); border-color: var(--primary-light); }
+  .card:hover::before { opacity: 1; }
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 10px; }
+  .card-title { font-size: 16px; font-weight: 900; color: var(--primary-dark); }
   
-  .badge { font-size: 11px; padding: 3px 10px; border-radius: 12px; white-space: nowrap; flex-shrink: 0; font-weight: 800; }
+  .badge { font-size: 12px; padding: 4px 12px; border-radius: 12px; white-space: nowrap; flex-shrink: 0; font-weight: 900; }
   .badge-green { background: #d1fae5; color: #047857; }
   .badge-blue { background: #dbeafe; color: #1d4ed8; }
   .badge-amber { background: #fef3c7; color: #b45309; }
   .badge-gray { background: #f1f5f9; color: #475569; }
   
-  .card-meta { font-size: 12px; color: #64748b; line-height: 1.8; font-weight: 600; }
-  .card-meta span { display: inline-block; margin-right: 12px; }
-  .card-note { margin-top: 10px; padding-top: 10px; border-top: 2px dashed var(--border); font-size: 12px; color: #94a3b8; font-weight: 600; }
-  .card-actions { margin-top: 12px; display: flex; gap: 8px; }
+  .card-meta { font-size: 13px; color: var(--text-muted); line-height: 2; font-weight: 700; }
+  .card-meta span { display: inline-block; margin-right: 14px; background: #f8fafc; padding: 2px 10px; border-radius: 8px; }
+  .card-note { margin-top: 12px; padding-top: 12px; border-top: 2px dashed #f1f5f9; font-size: 13px; color: #94a3b8; font-weight: 600; }
+  .card-actions { margin-top: 16px; display: flex; gap: 10px; }
 
-  /* 表格外层容器，控制移动端横向滚动 */
-  .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 16px; border: 3px solid var(--border); background: #fff; }
-  table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; min-width: 800px; /* 确保表格不被过度挤压 */ }
-  th { background: #ecfdf5; text-align: left; padding: 12px 14px; font-weight: 800; color: #059669; border-bottom: 2px solid #a7f3d0; font-size: 12px; white-space: nowrap; }
-  td { padding: 12px 14px; border-bottom: 1px solid #d1fae5; vertical-align: top; font-weight: 600; color: #334155; }
+  /* 表格 */
+  .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 20px; border: 2px solid var(--glass-border); background: #fff; box-shadow: var(--shadow-soft); }
+  table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; min-width: 800px; }
+  th { background: #f0fdfa; text-align: left; padding: 16px; font-weight: 900; color: var(--primary-dark); border-bottom: 2px solid #e0f2f1; font-size: 13px; white-space: nowrap; }
+  td { padding: 16px; border-bottom: 1px solid #f1f5f9; vertical-align: top; font-weight: 700; color: var(--text-main); transition: background 0.2s; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: #f8fafc; }
   
-  .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 8px; background: #e0f2fe; color: #0369a1; margin-right: 4px; margin-bottom: 4px; font-weight: 800; }
+  .tag { display: inline-block; font-size: 12px; padding: 3px 10px; border-radius: 10px; background: #e0f2fe; color: #0369a1; margin-right: 6px; margin-bottom: 6px; font-weight: 800; }
   .tag-po { background: #fef3c7; color: #b45309; }
   .tag-none { background: #f1f5f9; color: #94a3b8; }
   .tag-proj { background: #d1fae5; color: #059669; }
   
-  .amount { font-variant-numeric: tabular-nums; font-weight: 800; }
+  .amount { font-variant-numeric: tabular-nums; font-weight: 900; }
   .cost { color: #d97706; }
-  .status-done { color: #059669; font-weight: 800; }
-  .status-pending { color: #d97706; font-weight: 800; }
-  .diff-over { color: #dc2626; }
-  .diff-under { color: #059669; }
+  .status-done { color: #059669; font-weight: 900; }
+  .status-pending { color: #d97706; font-weight: 900; }
+  .diff-over { color: #dc2626; font-weight: 900; }
+  .diff-under { color: #059669; font-weight: 900; }
 
-  /* 弹层 */
-  .mask { position: fixed; inset: 0; background: rgba(6, 78, 59, 0.4); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 10px; }
+  /* 弹窗 */
+  .mask { position: fixed; inset: 0; background: rgba(44, 62, 80, 0.4); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 15px; }
   .mask.show { display: flex; }
-  .modal { background: #fff; border-radius: 20px; width: 640px; max-width: 100%; max-height: 90vh; overflow-y: auto; padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); border: 4px solid #34d399; }
-  .modal h3 { font-size: 18px; margin-bottom: 18px; color: #059669; font-weight: 800; text-align: center; }
+  .modal { background: #fff; border-radius: 24px; width: 640px; max-width: 100%; max-height: 90vh; overflow-y: auto; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); border: 4px solid #fff; position: relative; }
+  .modal::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, #48d1cc, #ffb6c1); border-radius: 20px 20px 0 0; }
+  .modal h3 { font-size: 20px; margin-bottom: 24px; color: var(--primary-dark); font-weight: 900; text-align: center; letter-spacing: 1px; }
   
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
   .form-row.full { grid-template-columns: 1fr; }
   .form-row.three { grid-template-columns: 1fr 1fr 1fr; }
-  .field label { display: block; font-size: 12px; color: #047857; margin-bottom: 6px; font-weight: 800; }
-  .field input, .field select, .field textarea { width: 100%; padding: 10px 12px; border: 2px solid #d1fae5; border-radius: 10px; font-size: 14px; font-family: inherit; outline: none; font-weight: 600; color: #334155; background: #f8fafc; transition: all .2s; }
-  .field input:focus, .field select:focus, .field textarea:focus { border-color: #34d399; background: #fff; box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.1); }
-  .field textarea { min-height: 60px; resize: vertical; }
+  .field label { display: block; font-size: 13px; color: var(--primary-dark); margin-bottom: 8px; font-weight: 900; }
+  .field input, .field select, .field textarea { width: 100%; padding: 12px 16px; border: 2px solid #e0f2f1; border-radius: 14px; font-size: 14px; font-family: inherit; outline: none; font-weight: 700; color: var(--text-main); background: #f8fafc; transition: all .3s; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 5px rgba(72, 209, 204, 0.15); transform: translateY(-2px); }
+  .field textarea { min-height: 80px; resize: vertical; }
 
-  .check-list { border: 2px solid #d1fae5; border-radius: 10px; max-height: 220px; overflow-y: auto; }
-  .check-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 13px; cursor: pointer; font-weight: 600; color: #334155; transition: background .2s; }
+  .check-list { border: 2px solid #e0f2f1; border-radius: 14px; max-height: 220px; overflow-y: auto; background: #f8fafc; }
+  .check-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #e0f2f1; font-size: 14px; cursor: pointer; font-weight: 700; color: var(--text-main); transition: background .2s; }
   .check-item:last-child { border-bottom: none; }
-  .check-item:hover { background: #f0fdf4; }
-  .check-item input { width: 18px; height: 18px; accent-color: #10b981; margin: 0; cursor: pointer; }
+  .check-item:hover { background: #f0fdfa; }
+  .check-item input { width: 20px; height: 20px; accent-color: var(--primary); margin: 0; cursor: pointer; border-radius: 6px; }
   .check-item .ci-name { flex: 1; }
-  .check-item .ci-spec { color: #94a3b8; font-size: 11px; }
+  .check-item .ci-spec { color: var(--text-muted); font-size: 12px; }
 
-  .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-  .empty { text-align: center; padding: 60px 20px; color: #6ee7b7; font-size: 15px; font-weight: 800; }
-  .summary { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
-  .summary .box { background: #fff; border: 2px solid #d1fae5; border-radius: 12px; padding: 8px 16px; font-size: 12px; font-weight: 800; color: #64748b; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-  .summary .box b { color: #059669; font-size: 16px; margin-left: 6px; }
-  .hint { font-size: 12px; color: #94a3b8; margin-top: 10px; font-weight: 600; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
   
-  .td-overdue { color: #dc2626; font-weight: 800; }
-  .td-today { color: #d97706; font-weight: 800; }
-  .td-upcoming { color: #059669; font-weight: 800; }
+  .empty { text-align: center; padding: 80px 20px; color: var(--primary-light); font-size: 18px; font-weight: 900; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+  .empty::before { content: '🍃'; font-size: 60px; animation: floatUp 3s infinite ease-in-out alternate; }
   
-  .toast-notification { position: fixed; bottom: 24px; right: 24px; background: #fff; border-left: 6px solid #ef4444; padding: 16px 20px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 99999; display: flex; flex-direction: column; gap: 6px; min-width: 280px; transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+  .summary { display: flex; gap: 14px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+  .summary .box { background: #fff; border: 2px solid var(--glass-border); border-radius: 16px; padding: 10px 20px; font-size: 13px; font-weight: 800; color: var(--text-muted); box-shadow: 0 4px 15px rgba(0,0,0,0.03); display: flex; align-items: center; gap: 8px; transition: transform 0.2s; }
+  .summary .box:hover { transform: translateY(-2px); }
+  .summary .box b { color: var(--primary-dark); font-size: 18px; font-weight: 900; }
+  .hint { font-size: 13px; color: var(--text-muted); margin-top: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  
+  .td-overdue { color: #ef4444; font-weight: 900; }
+  .td-today { color: #d97706; font-weight: 900; }
+  .td-upcoming { color: #059669; font-weight: 900; }
+  
+  /* 通知 */
+  .toast-notification { position: fixed; bottom: 30px; right: 30px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-left: 8px solid #ef4444; padding: 20px 24px; border-radius: 20px; box-shadow: 0 15px 40px rgba(239, 68, 68, 0.2); z-index: 99999; display: flex; flex-direction: column; gap: 8px; min-width: 300px; transform: translateX(150%); transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
   .toast-notification.show { transform: translateX(0); }
-  .toast-title { font-size: 15px; font-weight: 800; color: #dc2626; display: flex; align-items: center; gap: 6px; }
-  .toast-desc { font-size: 13px; color: #475569; font-weight: 600; }
-  .toast-close { position: absolute; top: 10px; right: 12px; cursor: pointer; color: #94a3b8; font-weight: 800; }
+  .toast-title { font-size: 16px; font-weight: 900; color: #dc2626; display: flex; align-items: center; gap: 8px; }
+  .toast-desc { font-size: 14px; color: var(--text-main); font-weight: 700; }
+  .toast-close { position: absolute; top: 12px; right: 16px; cursor: pointer; color: #94a3b8; font-weight: 900; font-size: 18px; transition: color 0.2s; }
+  .toast-close:hover { color: #ef4444; }
 
-  ::-webkit-scrollbar { width: 8px; height: 8px; }
-  ::-webkit-scrollbar-thumb { background: #6ee7b7; border-radius: 4px; }
-  ::-webkit-scrollbar-track { background: #f0fdf4; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: #b2dfdb; border-radius: 10px; border: 2px solid #fff; }
+  ::-webkit-scrollbar-track { background: transparent; }
 
   /* =========================================================
-     📱 手机端专属响应式适配 (宽度小于 768px 时生效)
+     📱 手机端适配
      ========================================================= */
   @media (max-width: 768px) {
     body { flex-direction: column; }
-    
-    /* 侧边栏变成横向导航 */
-    .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 3px solid var(--border); flex-shrink: 0; overflow-y: visible; display: block; }
-    .sidebar h1 { display: none; } /* 隐藏大标题省空间 */
-    
-    .mode-switch { padding: 10px 10px; overflow-x: auto; -webkit-overflow-scrolling: touch; justify-content: center; }
+    .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 2px solid var(--glass-border); flex-shrink: 0; overflow-y: visible; display: block; }
+    .sidebar h1 { display: none; }
+    .mode-switch { padding: 15px 15px 5px; overflow-x: auto; -webkit-overflow-scrolling: touch; justify-content: center; }
     .mode-switch::-webkit-scrollbar { display: none; }
-    .mode-btn { padding: 8px 12px; font-size: 12px; }
-
-    /* 归档分类滚动条 */
-    #archiveNav { display: flex; overflow-x: auto; padding: 0 10px 10px; gap: 6px; -webkit-overflow-scrolling: touch; }
-    #archiveNav::-webkit-scrollbar { display: none; }
-    .nav-group { display: flex; padding: 0; gap: 6px; }
-    .nav-group-title { display: none; } /* 隐藏分类小标题 */
-    .nav-item { margin: 0; padding: 6px 12px; background: #f0fdf4; border-radius: 20px; border-left: none; white-space: nowrap; font-size: 12px; }
-    .nav-item.active { background: #34d399; color: #fff; border-left: none; }
-    .nav-item .count { background: rgba(0,0,0,0.1); color: #fff; }
-
-    /* 项目列表 */
-    #projectNav { display: flex; overflow-x: auto; padding: 0 10px 10px; gap: 8px; -webkit-overflow-scrolling: touch; }
-    #projectNav::-webkit-scrollbar { display: none; }
+    .mode-btn { padding: 10px 15px; font-size: 13px; }
+    #archiveNav, #projectNav { display: flex; overflow-x: auto; padding: 5px 15px 15px; gap: 8px; -webkit-overflow-scrolling: touch; }
+    #archiveNav::-webkit-scrollbar, #projectNav::-webkit-scrollbar { display: none; }
+    .nav-group { display: flex; padding: 0; gap: 8px; }
+    .nav-group-title { display: none; }
+    .nav-item { margin: 0; padding: 8px 16px; background: #fff; border-radius: 20px; border: 2px solid #e0f2f1; white-space: nowrap; font-size: 13px; box-shadow: none; }
+    .nav-item.active { background: var(--primary-light); color: #fff; border-color: var(--primary-light); }
+    .nav-item .count { background: rgba(255,255,255,0.3); color: inherit; }
     .sidebar-btn-wrap { padding: 0; margin-top: 0; flex-shrink: 0; }
-    .sidebar-btn-wrap .btn { width: auto; padding: 8px 12px; font-size: 12px; border-radius: 20px; }
-    .project-item { margin: 0; padding: 8px 12px; min-width: 200px; flex-shrink: 0; }
-    .project-item .pname { font-size: 12px; }
-    .project-item .pstats { display: none; } /* 手机上不显示成本，太长 */
-
-    /* 主区域 */
-    .topbar { padding: 12px; flex-direction: column; align-items: flex-start; gap: 10px; }
-    .topbar h2 { font-size: 16px; width: 100%; }
+    .sidebar-btn-wrap .btn { width: auto; padding: 8px 16px; font-size: 13px; border-radius: 20px; }
+    .project-item { margin: 0; padding: 10px 16px; min-width: 220px; flex-shrink: 0; }
+    .pet-dino { display: none; } /* 手机端隐藏宠物省空间 */
+    
+    .topbar { padding: 15px; flex-direction: column; align-items: flex-start; gap: 12px; border-radius: 0 0 20px 20px; }
+    .topbar h2 { font-size: 18px; width: 100%; }
     .topbar .sub { width: 100%; margin-bottom: 4px; }
-    .topbar .btn { padding: 6px 10px; font-size: 12px; }
-    
-    .content { padding: 12px; }
-    
-    /* 卡片变单列 */
-    .card-grid { grid-template-columns: 1fr; gap: 12px; }
-    .card { padding: 12px; }
-    
-    /* 表单变单列 */
-    .form-row { grid-template-columns: 1fr; gap: 10px; }
+    .topbar .btn { padding: 8px 14px; font-size: 13px; }
+    .content { padding: 15px; }
+    .card-grid { grid-template-columns: 1fr; gap: 15px; }
+    .card { padding: 16px; }
+    .form-row { grid-template-columns: 1fr; gap: 14px; }
     .form-row.three { grid-template-columns: 1fr; }
-    .modal { padding: 16px; border-width: 3px; }
-    
-    /* 弹窗通知居中显示 */
+    .modal { padding: 24px 20px; border-radius: 20px; }
     .toast-notification { bottom: 20px; left: 20px; right: 20px; min-width: auto; transform: translateY(150%); }
     .toast-notification.show { transform: translateY(0); }
   }
@@ -239,17 +273,17 @@
 <!-- ================= 欢迎登录页 ================= -->
 <div class="welcome-screen hidden" id="welcomeScreen">
   <div class="welcome-card">
-    <div class="dino-mascot">🦖</div>
-    <h1 class="welcome-title">欢迎来到J21的牛马日记</h1>
-    <p class="welcome-subtitle">今天也是努力打工的一天呢！✨</p>
-    <input type="text" id="loginName" class="login-input" placeholder="请输入你的大名" value="J21" autocomplete="off">
+    <div class="dino-mascot" id="loginDino">🦖</div>
+    <h1 class="welcome-title">欢迎来到蒋哲的工作日记</h1>
+    <p class="welcome-subtitle">今天也要元气满满地打工哦！✨</p>
+    <input type="text" id="loginName" class="login-input" placeholder="请输入你的大名" value="蒋哲" autocomplete="off">
     <button class="login-btn" onclick="enterSystem()">开始打工 🚀</button>
   </div>
 </div>
 
 <!-- ================= 主系统 ================= -->
 <div class="sidebar">
-  <h1>📁 J21 工作管理平台</h1>
+  <h1>📁 蒋哲的工作台</h1>
   <div class="mode-switch">
     <button class="mode-btn active" id="modeArchiveBtn" onclick="switchMode('archive')">资料归档</button>
     <button class="mode-btn" id="modeProjectBtn" onclick="switchMode('project')">项目清单</button>
@@ -292,8 +326,11 @@
     <div class="sidebar-btn-wrap">
       <button class="btn btn-primary" onclick="openProjectModal()">＋ 新建项目</button>
     </div>
-    <div id="projectList" style="display:flex; gap:8px;"></div>
+    <div id="projectList" style="display:flex; gap:8px; flex-direction: column;"></div>
   </div>
+
+  <!-- 侧边栏小恐龙 -->
+  <div class="pet-dino" id="sidebarDino" onclick="dinoTalk()">🦖</div>
 </div>
 
 <div class="main">
@@ -304,9 +341,9 @@
       <span class="sub" id="arcCatDesc">所有分类的资料汇总</span>
       <button class="btn btn-primary" onclick="openArchiveModal()">＋ 新增资料</button>
     </div>
-    <div style="padding:12px 22px;background:#fff;border-bottom:3px solid var(--border);">
+    <div style="padding:0 26px 15px;background:transparent;">
       <input type="text" id="arcSearch" placeholder="🔍 搜索名称、备注、供应商、关联项目..." oninput="renderArchiveCards()"
-        style="width:100%;max-width:400px;padding:10px 16px;border:2px solid #d1fae5;border-radius:12px;font-size:13px;outline:none;font-weight:600;background:#f8fafc;color:#334155;transition:all .2s;">
+        style="width:100%;max-width:400px;padding:12px 20px;border:2px solid var(--glass-border);border-radius:16px;font-size:14px;outline:none;font-weight:700;background:#fff;color:var(--text-main);transition:all .3s; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
     </div>
   </div>
 
@@ -315,7 +352,7 @@
     <div class="topbar">
       <h2 id="projTitle">请选择左侧项目</h2>
       <span class="sub" id="projMeta"></span>
-      <div style="display:flex; gap:8px; flex-wrap:wrap; width:100%;">
+      <div style="display:flex; gap:10px; flex-wrap:wrap; width:100%; margin-top:10px;">
         <button class="btn btn-green btn-sm" onclick="exportProjectExcel()">📥 导出Excel表</button>
         <button class="btn btn-outline btn-sm" onclick="openItemModal()">＋ 清单单项</button>
         <button class="btn btn-outline btn-sm" onclick="openPOModal()">＋ 采购单</button>
@@ -335,7 +372,7 @@
   <div id="todoTopbar" style="display:none;">
     <div class="topbar">
       <h2>⏰ 未来待办提醒</h2>
-      <span class="sub">填好具体日期和时间，到点系统会自动弹窗提醒你</span>
+      <span class="sub">填好具体日期和时间，到点我会喊你哦！</span>
       <button class="btn btn-primary" onclick="openTodoModal()">＋ 新增待办</button>
     </div>
   </div>
@@ -382,7 +419,7 @@
       <div class="field"><label>关联方/供应商</label><input id="aRelated" placeholder="如：XX公司"></div>
     </div>
     <div class="form-row full">
-      <div class="field"><label>备注 / 要点</label><textarea id="aNote" placeholder="关键信息、截止日期、保管期限、归档位置等"></textarea></div>
+      <div class="field"><label>备注 / 要点</label><textarea id="aNote" placeholder="关键信息、截止日期等..."></textarea></div>
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeMask('archiveMask')">取消</button>
@@ -402,10 +439,10 @@
     </div>
     <div class="form-row">
       <div class="field"><label>状态</label><select id="pStatus"><option>进行中</option><option>已完成</option><option>已归档</option></select></div>
-      <div class="field"><label>负责人</label><input id="pOwner" placeholder="姓名"></div>
+      <div class="field"><label>负责人</label><input id="pOwner" value="蒋哲" placeholder="默认蒋哲"></div>
     </div>
     <div class="form-row full">
-      <div class="field"><label>备注</label><textarea id="pNote" placeholder="项目背景、关键节点等"></textarea></div>
+      <div class="field"><label>备注</label><textarea id="pNote" placeholder="项目背景、关键节点等..."></textarea></div>
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeMask('projectMask')">取消</button>
@@ -421,7 +458,7 @@
     <input type="hidden" id="iEditId">
     <div class="form-row">
       <div class="field"><label>单项名称 *</label><input id="iName" placeholder="如：机架式服务器"></div>
-      <div class="field"><label>规格/型号</label><input id="iSpec" placeholder="如：2U / 64核 / 256G"></div>
+      <div class="field"><label>规格/型号</label><input id="iSpec" placeholder="如：2U / 64核"></div>
     </div>
     <div class="form-row three">
       <div class="field"><label>数量</label><input type="number" id="iQty" value="1" min="0"></div>
@@ -429,7 +466,7 @@
       <div class="field"><label>预算单价（元）</label><input type="number" id="iPrice" step="0.01" placeholder="0"></div>
     </div>
     <div class="form-row full">
-      <div class="field"><label>备注</label><textarea id="iNote" placeholder="技术要求、到货要求等"></textarea></div>
+      <div class="field"><label>备注</label><textarea id="iNote" placeholder="技术要求等..."></textarea></div>
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeMask('itemMask')">取消</button>
@@ -444,7 +481,7 @@
     <h3 id="poModalTitle">🛒 新增采购单</h3>
     <input type="hidden" id="poEditId">
     <div class="form-row">
-      <div class="field"><label>采购单号 *</label><input id="poNo" placeholder="如：PO-2026-1015-01"></div>
+      <div class="field"><label>采购单号 *</label><input id="poNo" placeholder="如：PO-2026-1015"></div>
       <div class="field"><label>供应商</label><input id="poSupplier" placeholder="如：A科技有限公司"></div>
     </div>
     <div class="form-row three">
@@ -458,11 +495,11 @@
       <div class="field">
         <label>关联清单单项（可多选）*</label>
         <div class="check-list" id="itemCheckList"></div>
-        <div class="hint">勾选这张采购单对应的清单单项，可多选。金额将按勾选数量均摊到各单项的成本栏。</div>
+        <div class="hint">勾选采购单对应的单项，金额将均摊到成本中。</div>
       </div>
     </div>
     <div class="form-row full">
-      <div class="field"><label>备注</label><textarea id="poNote" placeholder="付款条件、交货期等"></textarea></div>
+      <div class="field"><label>备注</label><textarea id="poNote" placeholder="付款条件等..."></textarea></div>
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeMask('poMask')">取消</button>
@@ -475,20 +512,18 @@
 <div class="mask" id="importMask">
   <div class="modal">
     <h3>📥 批量导入清单</h3>
-    <div style="background:#ecfdf5; border:2px dashed #34d399; border-radius:12px; padding:16px; margin-bottom:16px; font-size:13px; line-height:1.8; color:#065f46; font-weight:600;">
+    <div style="background:#f0fdfa; border:2px dashed var(--primary-light); border-radius:16px; padding:20px; margin-bottom:20px; font-size:14px; line-height:1.8; color:var(--primary-dark); font-weight:700;">
       <b>操作步骤：</b><br>
       1. 点击下方“下载标准模板”，得到 CSV 文件。<br>
-      2. 用 Excel 或 WPS 打开模板，填入你的清单数据（不要修改第一行表头文字）。<br>
-      3. 保存文件。<br>
-      4. 在这里选择你保存好的 CSV 文件，系统自动解析。<br>
-      <span style="color:#dc2626; font-size:12px; margin-top:6px; display:inline-block;">* 若另存为时提示格式不兼容，请选择“是”保留 CSV 格式。</span>
+      2. 用 Excel 或 WPS 打开模板，填入数据（不要改表头）。<br>
+      3. 保存文件，并在下方选择该 CSV 文件导入。<br>
     </div>
-    <div style="display:flex; gap:12px; align-items:center; margin-bottom:20px; flex-wrap:wrap;">
+    <div style="display:flex; gap:14px; align-items:center; margin-bottom:20px; flex-wrap:wrap;">
       <button class="btn btn-outline" onclick="downloadTemplate()">⬇️ 下载标准模板 (CSV)</button>
     </div>
     <div class="field">
       <label>选择要上传的 CSV 文件</label>
-      <input type="file" id="csvFileInput" accept=".csv" style="background:#fff;">
+      <input type="file" id="csvFileInput" accept=".csv" style="background:#f8fafc;">
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeMask('importMask')">取消</button>
@@ -518,7 +553,7 @@
       </div>
     </div>
     <div class="form-row full">
-      <div class="field"><label>详细备注（可选）</label><textarea id="tNote" placeholder="准备材料、联系人等..."></textarea></div>
+      <div class="field"><label>详细备注（可选）</label><textarea id="tNote" placeholder="准备材料等..."></textarea></div>
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeMask('todoMask')">取消</button>
@@ -527,26 +562,28 @@
   </div>
 </div>
 
-<!-- 右下角通知弹窗 -->
+<!-- 右下角通知 -->
 <div class="toast-notification" id="toastNotification">
   <div class="toast-close" onclick="closeToast()">✕</div>
-  <div class="toast-title">⏰ 到点啦！牛马该干活了</div>
+  <div class="toast-title">⏰ 到点啦！蒋哲该干活了</div>
   <div class="toast-desc" id="toastDesc">待办事项内容...</div>
 </div>
 
 <script>
 /* =========================================================
-   欢迎页逻辑
+   欢迎页与特效逻辑
    ========================================================= */
 function enterSystem() {
   const name = document.getElementById('loginName').value.trim();
   if (!name) { alert('请输入你的名字'); return; }
   document.getElementById('welcomeScreen').classList.add('hidden');
+  confetti(); // 进入系统放烟花
 }
+
 window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('welcomeScreen').classList.remove('hidden');
   const screen = document.getElementById('welcomeScreen');
-  for(let i=0; i<15; i++) {
+  for(let i=0; i<20; i++) {
     let bubble = document.createElement('div');
     bubble.className = 'bg-bubble';
     let size = Math.random() * 60 + 20;
@@ -560,6 +597,41 @@ window.addEventListener('DOMContentLoaded', () => {
 document.getElementById('loginName').addEventListener('keypress', function(e) {
   if (e.key === 'Enter') enterSystem();
 });
+
+// 小恐龙互动
+function dinoTalk() {
+  const dino = document.getElementById('sidebarDino');
+  dino.style.transform = 'translateX(-50%) scale(1.3) rotate(-15deg)';
+  confetti();
+  setTimeout(() => { dino.style.transform = 'translateX(-50%) scale(1) rotate(0deg)'; }, 300);
+  
+  const msgs = ['呼~ 数据安全存入本机啦 ✨', '不要忘记喝水哦！💧', '今天也是棒棒的牛马！💪', '早点下班休息~ 🌙', '蒋哲冲鸭！🚀'];
+  const randomMsg = msgs[Math.floor(Math.random() * msgs.length)];
+  showToast(randomMsg, '🦖 小恐龙提示', '#10b981');
+}
+
+// 页面点击撒花特效
+function confetti() {
+  for (let i = 0; i < 15; i++) {
+    let star = document.createElement('div');
+    star.innerHTML = ['✨', '🌟', '⭐', '💖', '🍀'][Math.floor(Math.random() * 5)];
+    star.style.position = 'fixed';
+    star.style.left = '50%'; star.style.top = '50%';
+    star.style.fontSize = (Math.random() * 20 + 15) + 'px';
+    star.style.pointerEvents = 'none';
+    star.style.zIndex = '999999';
+    star.style.transition = 'all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+    document.body.appendChild(star);
+    
+    setTimeout(() => {
+      let x = (Math.random() - 0.5) * window.innerWidth;
+      let y = (Math.random() - 0.5) * window.innerHeight;
+      star.style.transform = `translate(${x}px, ${y}px) scale(0) rotate(${Math.random()*360}deg)`;
+      star.style.opacity = '0';
+    }, 10);
+    setTimeout(() => star.remove(), 800);
+  }
+}
 
 
 /* =========================================================
@@ -613,9 +685,6 @@ function persistAll() {
   localStorage.setItem(KEY_TODO, JSON.stringify(todos));
 }
 
-/* =========================================================
-   成本计算核心
-   ========================================================= */
 function calcItemCost(itemId) {
   let total = 0;
   pos.forEach(o => {
@@ -631,13 +700,10 @@ function calcProjectCost(projectId) {
   return its.reduce((s, it) => s + calcItemCost(it.id), 0);
 }
 
-/* =========================================================
-   演示数据
-   ========================================================= */
 function seedAll() {
   if (!archives.length && !projects.length) {
     const pid = uid();
-    projects.push({ id: pid, name: 'XX医院机房设备采购项目', code: 'ZB-2026-018', status: '进行中', owner: '张工', note: '投标已中标，进入采购执行阶段', createdAt: new Date().toISOString() });
+    projects.push({ id: pid, name: 'XX医院机房设备采购项目', code: 'ZB-2026-018', status: '进行中', owner: '蒋哲', note: '投标已中标，进入采购执行阶段', createdAt: new Date().toISOString() });
     const i1 = uid(), i2 = uid(), i3 = uid();
     items.push(
       { id: i1, projectId: pid, name: '机架式服务器', spec: '2U / 64核 / 256G内存 / 2×960G SSD', qty: 2, unit: '台', price: 42000, note: '含3年原厂质保' },
@@ -653,19 +719,14 @@ function seedAll() {
       { id: uid(), name: '公司资质证书汇总（2026版）', cat: 'bid-qual', status: '已归档', related: '', date: '2026-10-15', amount: '', note: '含营业执照、ISO证书。', projectId: '' },
       { id: uid(), name: 'XX项目投标文件（商务标+技术标）', cat: 'bid-doc', status: '已完成', related: '', date: '2026-10-18', amount: '', note: '已递交，保管期限：永久。', projectId: pid },
       { id: uid(), name: '服务器采购申请单', cat: 'buy-plan', status: '待处理', related: '', date: '2026-10-22', amount: '85000', note: '2台机架式服务器，需3家比价。', projectId: pid },
-      { id: uid(), name: 'A公司服务器报价单', cat: 'buy-supplier', status: '进行中', related: 'A科技有限公司', date: '2026-10-21', amount: '82000', note: '含3年质保，交货期15天。', projectId: pid },
-      { id: uid(), name: '办公用品采购合同-晨光文具', cat: 'buy-contract', status: '已完成', related: '晨光文具', date: '2026-10-10', amount: '3200', note: 'A4纸10箱、签字笔200支。', projectId: '' },
-      { id: uid(), name: '公司印章使用登记表', cat: 'office-doc', status: '进行中', related: '', date: '2026-10-01', amount: '', note: '本月已用印5次。', projectId: '' },
-      { id: uid(), name: '10月部门例会纪要', cat: 'office-meet', status: '已完成', related: '', date: '2026-10-08', amount: '', note: '重点：Q4投标计划。', projectId: '' },
-      { id: uid(), name: '9月办公费报销汇总', cat: 'fee-daily', status: '已完成', related: '', date: '2026-09-30', amount: '4860', note: '办公用品2100、快递费680、印刷费1580。', projectId: '' },
-      { id: uid(), name: '10月出差-北京投标', cat: 'fee-travel', status: '待处理', related: '', date: '2026-10-25', amount: '2800', note: '高铁往返1200、住宿900。', projectId: '' }
+      { id: uid(), name: 'A公司服务器报价单', cat: 'buy-supplier', status: '进行中', related: 'A科技有限公司', date: '2026-10-21', amount: '82000', note: '含3年质保，交货期15天。', projectId: pid }
     );
     persistAll();
   }
 }
 
 /* =========================================================
-   模式切换
+   模式切换与界面渲染
    ========================================================= */
 function switchMode(m) {
   mode = m;
@@ -685,9 +746,329 @@ function switchMode(m) {
   else renderTodoMode();
 }
 
-/* =========================================================
-   待办提醒逻辑
-   ========================================================= */
+/* ---------- 归档模式 ---------- */
+function switchArchiveCat(cat) {
+  currentCat = cat;
+  document.querySelectorAll('#archiveNav .nav-item').forEach(el => el.classList.toggle('active', el.dataset.cat === cat));
+  const cfg = cat === 'all' ? { name: '全部资料', desc: '所有分类的资料汇总' } : CATS[cat];
+  document.getElementById('arcCatTitle').textContent = cfg.name;
+  document.getElementById('arcCatDesc').textContent = cfg.desc;
+  renderArchiveCards();
+}
+
+function updateArchiveCounts() {
+  document.getElementById('countAll').textContent = archives.length;
+  const map = {'bid-info':'countBidInfo','bid-qual':'countBidQual','bid-doc':'countBidDoc','buy-plan':'countBuyPlan','buy-supplier':'countBuySupplier','buy-contract':'countBuyContract','office-doc':'countOfficeDoc','office-meet':'countOfficeMeet','office-misc':'countOfficeMisc','fee-daily':'countFeeDaily','fee-travel':'countFeeTravel','fee-other':'countFeeOther'};
+  Object.keys(map).forEach(cat => {
+    const el = document.getElementById(map[cat]);
+    if (el) el.textContent = archives.filter(i => i.cat === cat).length;
+  });
+}
+
+function renderArchiveMode() { updateArchiveCounts(); renderArchiveCards(); }
+
+function renderArchiveCards() {
+  const kw = document.getElementById('arcSearch').value.trim().toLowerCase();
+  let list = archives.slice();
+  if (currentCat !== 'all') list = list.filter(i => i.cat === currentCat);
+  if (kw) list = list.filter(i => (i.name||'').toLowerCase().includes(kw) || (i.note||'').toLowerCase().includes(kw) || (i.related||'').toLowerCase().includes(kw));
+  list.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+
+  const area = document.getElementById('contentArea');
+  if (!list.length) {
+    area.innerHTML = '<div class="empty">这里空空的哦，点右上角“＋ 新增资料”开始记录吧！🌱</div>';
+    return;
+  }
+
+  area.innerHTML = `<div class="card-grid">${list.map(i => {
+    const catCfg = CATS[i.cat] || { name: '未分类', icon: '📁' };
+    let badgeCls = 'badge-gray';
+    if (i.status === '已完成') badgeCls = 'badge-green';
+    else if (i.status === '进行中') badgeCls = 'badge-blue';
+    else if (i.status === '待处理') badgeCls = 'badge-amber';
+    const proj = i.projectId ? projects.find(p => p.id === i.projectId) : null;
+    return `<div class="card">
+      <div class="card-header">
+        <span class="card-title">${esc(i.name)}</span>
+        <span class="badge ${badgeCls}">${esc(i.status||'')}</span>
+      </div>
+      <div class="card-meta">
+        <span>${catCfg.icon} ${catCfg.name}</span>
+        ${i.related ? `<span>🔗 ${esc(i.related)}</span>` : ''}
+        ${i.date ? `<span>📅 ${esc(i.date)}</span>` : ''}
+        ${i.amount ? `<span>💰 ¥${fmt(i.amount)}</span>` : ''}
+      </div>
+      ${proj ? `<div style="margin-top:10px"><span class="tag tag-proj">📁 ${esc(proj.name)}</span></div>` : ''}
+      ${i.note ? `<div class="card-note">${esc(i.note).slice(0,90)}${i.note.length>90?'…':''}</div>` : ''}
+      <div class="card-actions">
+        <button class="btn btn-outline btn-sm" onclick="openArchiveModal('${i.id}')">编辑</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteArchive('${i.id}')">删除</button>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function openArchiveModal(id) {
+  const isEdit = !!id;
+  const a = isEdit ? archives.find(x => x.id === id) : null;
+  document.getElementById('archiveModalTitle').textContent = isEdit ? '✏️ 编辑资料' : '📝 新增资料';
+  document.getElementById('aEditId').value = id || '';
+  document.getElementById('aName').value = a ? a.name : '';
+  document.getElementById('aCat').value = a ? a.cat : (currentCat === 'all' ? 'bid-info' : currentCat);
+  document.getElementById('aStatus').value = a ? (a.status||'进行中') : '进行中';
+  document.getElementById('aDate').value = a ? (a.date||'') : new Date().toISOString().slice(0,10);
+  document.getElementById('aAmount').value = a ? (a.amount||'') : '';
+  document.getElementById('aRelated').value = a ? (a.related||'') : '';
+  document.getElementById('aNote').value = a ? (a.note||'') : '';
+  const sel = document.getElementById('aProject');
+  sel.innerHTML = '<option value="">不关联</option>' + projects.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  sel.value = a ? (a.projectId||'') : '';
+  document.getElementById('archiveMask').classList.add('show');
+}
+
+function saveArchive() {
+  const name = document.getElementById('aName').value.trim();
+  if (!name) { alert('请填写资料名称'); return; }
+  const id = document.getElementById('aEditId').value;
+  const data = {
+    name, cat: document.getElementById('aCat').value, status: document.getElementById('aStatus').value,
+    projectId: document.getElementById('aProject').value, date: document.getElementById('aDate').value,
+    amount: document.getElementById('aAmount').value, related: document.getElementById('aRelated').value.trim(),
+    note: document.getElementById('aNote').value.trim()
+  };
+  if (id) Object.assign(archives.find(x => x.id === id), data);
+  else archives.push({ id: uid(), ...data, createdAt: new Date().toISOString() });
+  persistAll(); updateArchiveCounts(); renderArchiveCards(); closeMask('archiveMask');
+  confetti(); // 保存撒花
+}
+
+function deleteArchive(id) {
+  if (!confirm('确定删除这条资料吗？')) return;
+  archives = archives.filter(i => i.id !== id);
+  persistAll(); updateArchiveCounts(); renderArchiveCards();
+}
+
+/* ---------- 项目模式 ---------- */
+function renderProjectMode() {
+  renderProjectList();
+  if (currentProjectId && projects.find(p => p.id === currentProjectId)) {
+    selectProject(currentProjectId);
+  } else if (projects.length) {
+    selectProject(projects[0].id);
+  } else {
+    document.getElementById('projTitle').textContent = '请新建项目';
+    document.getElementById('projMeta').textContent = '';
+    document.getElementById('contentArea').innerHTML = '<div class="empty">还没有项目，点左侧“＋ 新建项目”开始吧！🌱</div>';
+  }
+}
+
+function renderProjectList() {
+  const el = document.getElementById('projectList');
+  if (!projects.length) {
+    el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--primary-light);font-size:13px;font-weight:900;">暂无项目哦~</div>';
+    return;
+  }
+  el.innerHTML = projects.map(p => {
+    const its = items.filter(i => i.projectId === p.id);
+    const pcs = pos.filter(o => o.projectId === p.id);
+    const active = p.id === currentProjectId ? ' active' : '';
+    const cost = calcProjectCost(p.id);
+    return `<div class="project-item${active}" onclick="selectProject('${p.id}')">
+      <div class="pname">${esc(p.name)}</div>
+      <div class="pmeta">${esc(p.code||'无编号')} · ${esc(p.status)} · 👤 ${esc(p.owner||'蒋哲')}</div>
+      <div class="pstats">${its.length} 单项 · ${pcs.length} 采购单 · 成本 ¥${fmt(cost)}</div>
+    </div>`;
+  }).join('');
+}
+
+function selectProject(id) {
+  currentProjectId = id;
+  const p = projects.find(x => x.id === id);
+  document.getElementById('projTitle').textContent = p ? p.name : '请选择项目';
+  document.getElementById('projMeta').textContent = p ? `${p.code||''} · ${p.status} · 负责人：${p.owner||'蒋哲'}` : '';
+  renderProjectList();
+  renderProjectContent();
+}
+
+function switchProjectTab(tab) {
+  currentProjectTab = tab;
+  document.querySelectorAll('#tabs .tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  renderProjectContent();
+}
+
+function renderProjectContent() {
+  if (!currentProjectId) {
+    document.getElementById('contentArea').innerHTML = '<div class="empty">请先在左侧选择或新建一个项目</div>';
+    return;
+  }
+  if (currentProjectTab === 'items') renderItemsTable();
+  else if (currentProjectTab === 'pos') renderPOTable();
+  else if (currentProjectTab === 'matrix') renderMatrix();
+  else renderProjectArchive();
+}
+
+function renderItemsTable() {
+  const its = items.filter(i => i.projectId === currentProjectId);
+  const pcs = pos.filter(o => o.projectId === currentProjectId);
+  const totalBudget = its.reduce((s,i) => s + (Number(i.qty)||0) * (Number(i.price)||0), 0);
+  const totalCost = its.reduce((s,i) => s + calcItemCost(i.id), 0);
+  const totalDiff = totalBudget - totalCost;
+
+  let html = `<div class="summary">
+    <div class="box">清单单项<b>${its.length}</b></div>
+    <div class="box">预算合计<b>¥${fmt(totalBudget)}</b></div>
+    <div class="box">已采购成本<b>¥${fmt(totalCost)}</b></div>
+    <div class="box">预算结余<b class="${totalDiff>=0?'diff-under':'diff-over'}">¥${fmt(totalDiff)}</b></div>
+    <div class="box">关联采购单<b>${pcs.length}</b></div>
+    <button class="btn btn-green btn-sm" onclick="openImportModal()" style="margin-left:auto;">📥 批量导入清单</button>
+  </div>`;
+
+  if (!its.length) {
+    html += '<div class="empty">还没有清单单项，点右上角“＋ 清单单项”手动添加，或点击上方“批量导入清单”哦！✨</div>';
+    document.getElementById('contentArea').innerHTML = html;
+    return;
+  }
+
+  html += `<div class="table-wrap"><table><thead><tr>
+    <th style="width:24%">单项名称</th><th>规格/型号</th><th>数量</th><th>预算单价</th>
+    <th>预算小计</th><th>已采购成本</th><th>预算结余</th><th style="width:18%">关联采购单</th><th style="width:120px">操作</th>
+  </tr></thead><tbody>`;
+
+  its.forEach(it => {
+    const linked = pcs.filter(o => (o.itemIds||[]).includes(it.id));
+    const linkedHtml = linked.length
+      ? linked.map(o => `<span class="tag tag-po" title="${esc(o.supplier||'')}">${esc(o.no)}</span>`).join('')
+      : '<span class="tag tag-none">未关联</span>';
+    const budgetSub = (Number(it.qty)||0) * (Number(it.price)||0);
+    const cost = calcItemCost(it.id);
+    const diff = budgetSub - cost;
+    const diffCls = diff >= 0 ? 'diff-under' : 'diff-over';
+    html += `<tr>
+      <td><b>${esc(it.name)}</b>${it.note?`<div style="color:#94a3b8;font-size:12px;margin-top:6px;font-weight:600;">${esc(it.note).slice(0,40)}</div>`:''}</td>
+      <td>${esc(it.spec||'-')}</td>
+      <td>${it.qty||0} ${esc(it.unit||'')}</td>
+      <td class="amount">¥${fmt(it.price)}</td>
+      <td class="amount">¥${fmt(budgetSub)}</td>
+      <td class="amount cost">¥${fmt(cost)}</td>
+      <td class="amount ${diffCls}">¥${fmt(diff)}</td>
+      <td>${linkedHtml}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="openItemModal('${it.id}')">编辑</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteItem('${it.id}')">删</button>
+      </td>
+    </tr>`;
+  });
+  html += '</tbody></table></div>';
+  html += '<div class="hint">💡 “已采购成本”自动汇总自关联的采购单金额。预算结余 = 预算小计 − 已采购成本，负数红色表示超预算哦。</div>';
+  document.getElementById('contentArea').innerHTML = html;
+}
+
+function renderPOTable() {
+  const pcs = pos.filter(o => o.projectId === currentProjectId);
+  const its = items.filter(i => i.projectId === currentProjectId);
+  const total = pcs.reduce((s,o) => s + (Number(o.amount)||0), 0);
+
+  let html = `<div class="summary">
+    <div class="box">采购单<b>${pcs.length}</b></div>
+    <div class="box">采购金额合计<b>¥${fmt(total)}</b></div>
+  </div>`;
+
+  if (!pcs.length) {
+    html += '<div class="empty">还没有采购单，点右上角“＋ 采购单”添加哦！🛒</div>';
+    document.getElementById('contentArea').innerHTML = html;
+    return;
+  }
+
+  html += `<div class="table-wrap"><table><thead><tr>
+    <th>采购单号</th><th>供应商</th><th>日期</th><th>金额</th><th>状态</th>
+    <th style="width:26%">关联清单单项（均摊）</th><th style="width:120px">操作</th>
+  </tr></thead><tbody>`;
+
+  pcs.forEach(o => {
+    const linked = (o.itemIds||[]).map(iid => its.find(x => x.id === iid)).filter(Boolean);
+    const share = linked.length ? (Number(o.amount)||0) / linked.length : 0;
+    const linkedHtml = linked.length
+      ? linked.map(x => `<span class="tag">${esc(x.name)} <span style="color:#059669;font-weight:900">¥${fmt(share)}</span></span>`).join('')
+      : '<span class="tag tag-none">未关联</span>';
+    const stCls = o.status === '已验收' || o.status === '已付款' ? 'status-done' : 'status-pending';
+    html += `<tr>
+      <td><b>${esc(o.no)}</b></td>
+      <td>${esc(o.supplier||'-')}</td>
+      <td>${esc(o.date||'-')}</td>
+      <td class="amount">¥${fmt(o.amount)}</td>
+      <td class="${stCls}">${esc(o.status||'-')}</td>
+      <td>${linkedHtml}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="openPOModal('${o.id}')">编辑</button>
+        <button class="btn btn-danger btn-sm" onclick="deletePO('${o.id}')">删</button>
+      </td>
+    </tr>`;
+  });
+  html += '</tbody></table></div>';
+  document.getElementById('contentArea').innerHTML = html;
+}
+
+function renderMatrix() {
+  const its = items.filter(i => i.projectId === currentProjectId);
+  const pcs = pos.filter(o => o.projectId === currentProjectId);
+  if (!its.length || !pcs.length) {
+    document.getElementById('contentArea').innerHTML = '<div class="empty">需要同时有清单单项和采购单，才能看到关联总览哦~ 🧐</div>';
+    return;
+  }
+  const totalCost = its.reduce((s,i) => s + calcItemCost(i.id), 0);
+  let html = `<div class="summary">
+    <div class="box">单项<b>${its.length}</b></div>
+    <div class="box">采购单<b>${pcs.length}</b></div>
+    <div class="box">已关联单项<b>${its.filter(it => pcs.some(o => (o.itemIds||[]).includes(it.id))).length}</b></div>
+    <div class="box">成本合计<b>¥${fmt(totalCost)}</b></div>
+  </div>`;
+  html += `<div class="table-wrap"><table><thead><tr><th style="width:20%">清单单项</th>`;
+  pcs.forEach(o => { html += `<th style="text-align:center;font-size:13px;">${esc(o.no)}<br><span style="font-weight:700;color:var(--text-muted);">¥${fmt(o.amount)}</span></th>`; });
+  html += `<th>该项成本合计</th></tr></thead><tbody>`;
+  its.forEach(it => {
+    html += `<tr><td><b>${esc(it.name)}</b><div style="color:#94a3b8;font-size:12px;margin-top:6px;font-weight:600;">${esc(it.spec||'')}</div></td>`;
+    pcs.forEach(o => {
+      const hit = (o.itemIds||[]).includes(it.id);
+      if (hit) {
+        const share = (Number(o.amount)||0) / (o.itemIds||[]).length;
+        html += `<td style="text-align:center"><span style="color:#10b981;font-weight:900;font-size:18px;">✓</span><div style="font-size:12px;color:#d97706;font-weight:900;margin-top:4px;">¥${fmt(share)}</div></td>`;
+      } else {
+        html += `<td style="text-align:center"><span style="color:#e2e8f0;font-weight:900;font-size:18px;">—</span></td>`;
+      }
+    });
+    const cost = calcItemCost(it.id);
+    html += `<td class="amount cost">¥${fmt(cost)}</td></tr>`;
+  });
+  html += '</tbody></table></div><div class="hint">💡 ✓ 表示该采购单包含此清单单项，下方小字为该采购单均摊到本单项的金额。</div>';
+  document.getElementById('contentArea').innerHTML = html;
+}
+
+function renderProjectArchive() {
+  const list = archives.filter(a => a.projectId === currentProjectId);
+  if (!list.length) {
+    document.getElementById('contentArea').innerHTML = '<div class="empty">该项目还没有关联的归档资料。<br>到“资料归档”模式编辑资料，在“关联项目”里选择本项目即可。📁</div>';
+    return;
+  }
+  let html = `<div class="summary"><div class="box">关联资料<b>${list.length}</b></div></div>`;
+  html += `<div class="table-wrap"><table><thead><tr><th style="width:30%">资料名称</th><th>分类</th><th>状态</th><th>日期</th><th>金额</th><th style="width:120px">操作</th></tr></thead><tbody>`;
+  list.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  list.forEach(a => {
+    const catCfg = CATS[a.cat] || { name: '未分类', icon: '📁' };
+    const stCls = a.status === '已完成' ? 'status-done' : (a.status === '待处理' ? 'status-pending' : '');
+    html += `<tr>
+      <td><b>${esc(a.name)}</b></td>
+      <td>${catCfg.icon} ${catCfg.name}</td>
+      <td class="${stCls}">${esc(a.status||'-')}</td>
+      <td>${esc(a.date||'-')}</td>
+      <td class="amount">${a.amount ? '¥'+fmt(a.amount) : '-'}</td>
+      <td><button class="btn btn-outline btn-sm" onclick="openArchiveModal('${a.id}')">编辑</button></td>
+    </tr>`;
+  });
+  html += '</tbody></table></div>';
+  document.getElementById('contentArea').innerHTML = html;
+}
+
+/* ---------- 待办提醒 ---------- */
 function renderTodoMode() {
   const list = todos.slice().sort((a,b) => (a.date+' '+a.time).localeCompare(b.date+' '+b.time));
   const area = document.getElementById('contentArea');
@@ -701,7 +1082,7 @@ function renderTodoMode() {
   const todayStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
 
   let html = `<div class="table-wrap"><table><thead><tr>
-    <th style="width:35%">待办事项</th><th>提醒时间</th><th>关联项目</th><th>状态</th><th style="width:150px">操作</th>
+    <th style="width:35%">待办事项</th><th>提醒时间</th><th>关联项目</th><th>状态</th><th style="width:160px">操作</th>
   </tr></thead><tbody>`;
 
   list.forEach(t => {
@@ -716,7 +1097,7 @@ function renderTodoMode() {
     const titleStyle = t.status === '已完成' ? 'text-decoration: line-through; color: #94a3b8;' : '';
 
     html += `<tr>
-      <td><b style="${titleStyle}">${esc(t.title)}</b>${t.note ? `<div style="color:#94a3b8;font-size:11px;margin-top:4px;">${esc(t.note)}</div>` : ''}</td>
+      <td><b style="${titleStyle}">${esc(t.title)}</b>${t.note ? `<div style="color:#94a3b8;font-size:12px;margin-top:6px;font-weight:600;">${esc(t.note)}</div>` : ''}</td>
       <td class="${timeCls}">${timeText}</td>
       <td>${proj ? `<span class="tag tag-proj">📁 ${esc(proj.name)}</span>` : '-'}</td>
       <td class="${stCls}">${esc(t.status)}</td>
@@ -772,11 +1153,17 @@ function saveTodo() {
     todos.push({ id: uid(), ...data, createdAt: new Date().toISOString() });
   }
   persistAll(); renderTodoMode(); closeMask('todoMask');
+  confetti(); // 保存撒花
 }
 
 function markTodoDone(id) {
   const t = todos.find(x => x.id === id);
-  if(t) { t.status = '已完成'; persistAll(); renderTodoMode(); }
+  if(t) { 
+    t.status = '已完成'; 
+    persistAll(); 
+    renderTodoMode(); 
+    confetti(); // 完成撒花
+  }
 }
 
 function deleteTodo(id) {
@@ -786,7 +1173,7 @@ function deleteTodo(id) {
 }
 
 /* =========================================================
-   系统级轮询：检查是否到点提醒
+   系统级轮询提醒
    ========================================================= */
 let toastTimer;
 function closeToast() {
@@ -810,17 +1197,21 @@ function checkReminders() {
       if (currentDateTime >= targetDateTime) {
         t.hasAlerted = true;
         changed = true;
-        showToast(`【${t.title}】\n设定时间：${targetDateTime}`);
+        showToast(`【${t.title}】\n设定时间：${targetDateTime}`, '⏰ 到点啦！', '#ef4444');
       }
     }
   });
   if (changed) persistAll();
 }
 
-function showToast(msg) {
+function showToast(msg, title = '🦖 小恐龙提示', color = '#10b981') {
   const box = document.getElementById('toastNotification');
+  document.querySelector('.toast-title').innerText = title;
+  document.querySelector('.toast-title').style.color = color;
+  box.style.borderLeftColor = color;
   document.getElementById('toastDesc').innerText = msg;
   box.classList.add('show');
+  
   try {
     const context = new (window.AudioContext || window.webkitAudioContext)();
     const osc = context.createOscillator();
@@ -837,349 +1228,8 @@ function showToast(msg) {
 
 setInterval(checkReminders, 10000);
 
-
 /* =========================================================
-   归档模式
-   ========================================================= */
-function switchArchiveCat(cat) {
-  currentCat = cat;
-  document.querySelectorAll('#archiveNav .nav-item').forEach(el => el.classList.toggle('active', el.dataset.cat === cat));
-  const cfg = cat === 'all' ? { name: '全部资料', desc: '所有分类的资料汇总' } : CATS[cat];
-  document.getElementById('arcCatTitle').textContent = cfg.name;
-  document.getElementById('arcCatDesc').textContent = cfg.desc;
-  renderArchiveCards();
-}
-
-function updateArchiveCounts() {
-  document.getElementById('countAll').textContent = archives.length;
-  const map = {
-    'bid-info':'countBidInfo','bid-qual':'countBidQual','bid-doc':'countBidDoc',
-    'buy-plan':'countBuyPlan','buy-supplier':'countBuySupplier','buy-contract':'countBuyContract',
-    'office-doc':'countOfficeDoc','office-meet':'countOfficeMeet','office-misc':'countOfficeMisc',
-    'fee-daily':'countFeeDaily','fee-travel':'countFeeTravel','fee-other':'countFeeOther'
-  };
-  Object.keys(map).forEach(cat => {
-    const el = document.getElementById(map[cat]);
-    if (el) el.textContent = archives.filter(i => i.cat === cat).length;
-  });
-}
-
-function renderArchiveMode() { updateArchiveCounts(); renderArchiveCards(); }
-
-function renderArchiveCards() {
-  const kw = document.getElementById('arcSearch').value.trim().toLowerCase();
-  let list = archives.slice();
-  if (currentCat !== 'all') list = list.filter(i => i.cat === currentCat);
-  if (kw) list = list.filter(i =>
-    (i.name||'').toLowerCase().includes(kw) ||
-    (i.note||'').toLowerCase().includes(kw) ||
-    (i.related||'').toLowerCase().includes(kw)
-  );
-  list.sort((a,b) => (b.date||'').localeCompare(a.date||''));
-
-  const area = document.getElementById('contentArea');
-  if (!list.length) {
-    area.innerHTML = '<div class="empty">这里空空的哦，点右上角“＋ 新增资料”开始记录吧！🌱</div>';
-    return;
-  }
-
-  area.innerHTML = `<div class="card-grid">${list.map(i => {
-    const catCfg = CATS[i.cat] || { name: '未分类', icon: '📁' };
-    let badgeCls = 'badge-gray';
-    if (i.status === '已完成') badgeCls = 'badge-green';
-    else if (i.status === '进行中') badgeCls = 'badge-blue';
-    else if (i.status === '待处理') badgeCls = 'badge-amber';
-    const proj = i.projectId ? projects.find(p => p.id === i.projectId) : null;
-    return `<div class="card">
-      <div class="card-header">
-        <span class="card-title">${esc(i.name)}</span>
-        <span class="badge ${badgeCls}">${esc(i.status||'')}</span>
-      </div>
-      <div class="card-meta">
-        <span>${catCfg.icon} ${catCfg.name}</span>
-        ${i.related ? `<span>🔗 ${esc(i.related)}</span>` : ''}
-        ${i.date ? `<span>📅 ${esc(i.date)}</span>` : ''}
-        ${i.amount ? `<span>💰 ¥${fmt(i.amount)}</span>` : ''}
-      </div>
-      ${proj ? `<div style="margin-top:8px"><span class="tag tag-proj">📁 ${esc(proj.name)}</span></div>` : ''}
-      ${i.note ? `<div class="card-note">${esc(i.note).slice(0,90)}${i.note.length>90?'…':''}</div>` : ''}
-      <div class="card-actions">
-        <button class="btn btn-outline btn-sm" onclick="openArchiveModal('${i.id}')">编辑</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteArchive('${i.id}')">删除</button>
-      </div>
-    </div>`;
-  }).join('')}</div>`;
-}
-
-function openArchiveModal(id) {
-  const isEdit = !!id;
-  const a = isEdit ? archives.find(x => x.id === id) : null;
-  document.getElementById('archiveModalTitle').textContent = isEdit ? '✏️ 编辑资料' : '📝 新增资料';
-  document.getElementById('aEditId').value = id || '';
-  document.getElementById('aName').value = a ? a.name : '';
-  document.getElementById('aCat').value = a ? a.cat : (currentCat === 'all' ? 'bid-info' : currentCat);
-  document.getElementById('aStatus').value = a ? (a.status||'进行中') : '进行中';
-  document.getElementById('aDate').value = a ? (a.date||'') : new Date().toISOString().slice(0,10);
-  document.getElementById('aAmount').value = a ? (a.amount||'') : '';
-  document.getElementById('aRelated').value = a ? (a.related||'') : '';
-  document.getElementById('aNote').value = a ? (a.note||'') : '';
-  const sel = document.getElementById('aProject');
-  sel.innerHTML = '<option value="">不关联</option>' +
-    projects.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
-  sel.value = a ? (a.projectId||'') : '';
-  document.getElementById('archiveMask').classList.add('show');
-}
-
-function saveArchive() {
-  const name = document.getElementById('aName').value.trim();
-  if (!name) { alert('请填写资料名称'); return; }
-  const id = document.getElementById('aEditId').value;
-  const data = {
-    name, cat: document.getElementById('aCat').value, status: document.getElementById('aStatus').value,
-    projectId: document.getElementById('aProject').value, date: document.getElementById('aDate').value,
-    amount: document.getElementById('aAmount').value, related: document.getElementById('aRelated').value.trim(),
-    note: document.getElementById('aNote').value.trim()
-  };
-  if (id) Object.assign(archives.find(x => x.id === id), data);
-  else archives.push({ id: uid(), ...data, createdAt: new Date().toISOString() });
-  persistAll(); updateArchiveCounts(); renderArchiveCards(); closeMask('archiveMask');
-}
-
-function deleteArchive(id) {
-  if (!confirm('确定删除这条资料吗？')) return;
-  archives = archives.filter(i => i.id !== id);
-  persistAll(); updateArchiveCounts(); renderArchiveCards();
-}
-
-/* =========================================================
-   项目模式
-   ========================================================= */
-function renderProjectMode() {
-  renderProjectList();
-  if (currentProjectId && projects.find(p => p.id === currentProjectId)) {
-    selectProject(currentProjectId);
-  } else if (projects.length) {
-    selectProject(projects[0].id);
-  } else {
-    document.getElementById('projTitle').textContent = '请新建项目';
-    document.getElementById('projMeta').textContent = '';
-    document.getElementById('contentArea').innerHTML = '<div class="empty">还没有项目，点左侧“＋ 新建项目”开始吧！🌱</div>';
-  }
-}
-
-function renderProjectList() {
-  const el = document.getElementById('projectList');
-  if (!projects.length) {
-    el.innerHTML = '<div style="padding:20px;text-align:center;color:#6ee7b7;font-size:12px;font-weight:800;">暂无项目哦~</div>';
-    return;
-  }
-  el.innerHTML = projects.map(p => {
-    const its = items.filter(i => i.projectId === p.id);
-    const pcs = pos.filter(o => o.projectId === p.id);
-    const active = p.id === currentProjectId ? ' active' : '';
-    const cost = calcProjectCost(p.id);
-    return `<div class="project-item${active}" onclick="selectProject('${p.id}')">
-      <div class="pname">${esc(p.name)}</div>
-      <div class="pmeta">${esc(p.code||'无编号')} · ${esc(p.status)}</div>
-      <div class="pstats">${its.length} 单项 · ${pcs.length} 采购单 · 成本 ¥${fmt(cost)}</div>
-    </div>`;
-  }).join('');
-}
-
-function selectProject(id) {
-  currentProjectId = id;
-  const p = projects.find(x => x.id === id);
-  document.getElementById('projTitle').textContent = p ? p.name : '请选择项目';
-  document.getElementById('projMeta').textContent = p ? `${p.code||''} · ${p.status} · 负责人：${p.owner||'-'}` : '';
-  renderProjectList();
-  renderProjectContent();
-}
-
-function switchProjectTab(tab) {
-  currentProjectTab = tab;
-  document.querySelectorAll('#tabs .tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
-  renderProjectContent();
-}
-
-function renderProjectContent() {
-  if (!currentProjectId) {
-    document.getElementById('contentArea').innerHTML = '<div class="empty">请先在左侧选择或新建一个项目</div>';
-    return;
-  }
-  if (currentProjectTab === 'items') renderItemsTable();
-  else if (currentProjectTab === 'pos') renderPOTable();
-  else if (currentProjectTab === 'matrix') renderMatrix();
-  else renderProjectArchive();
-}
-
-/* ---------- 清单单项表格 ---------- */
-function renderItemsTable() {
-  const its = items.filter(i => i.projectId === currentProjectId);
-  const pcs = pos.filter(o => o.projectId === currentProjectId);
-  const totalBudget = its.reduce((s,i) => s + (Number(i.qty)||0) * (Number(i.price)||0), 0);
-  const totalCost = its.reduce((s,i) => s + calcItemCost(i.id), 0);
-  const totalDiff = totalBudget - totalCost;
-
-  let html = `<div class="summary">
-    <div class="box">清单单项<b>${its.length}</b></div>
-    <div class="box">预算合计<b>¥${fmt(totalBudget)}</b></div>
-    <div class="box">已采购成本<b>¥${fmt(totalCost)}</b></div>
-    <div class="box">预算结余<b class="${totalDiff>=0?'diff-under':'diff-over'}">¥${fmt(totalDiff)}</b></div>
-    <div class="box">关联采购单<b>${pcs.length}</b></div>
-    <button class="btn btn-green btn-sm" onclick="openImportModal()" style="margin-left:auto;">📥 批量导入清单</button>
-  </div>`;
-
-  if (!its.length) {
-    html += '<div class="empty">还没有清单单项，点右上角“＋ 清单单项”手动添加，或点击上方“批量导入清单”哦！✨</div>';
-    document.getElementById('contentArea').innerHTML = html;
-    return;
-  }
-
-  html += `<div class="table-wrap"><table><thead><tr>
-    <th style="width:24%">单项名称</th><th>规格/型号</th><th>数量</th><th>预算单价</th>
-    <th>预算小计</th><th>已采购成本</th><th>预算结余</th><th style="width:18%">关联采购单</th><th style="width:100px">操作</th>
-  </tr></thead><tbody>`;
-
-  its.forEach(it => {
-    const linked = pcs.filter(o => (o.itemIds||[]).includes(it.id));
-    const linkedHtml = linked.length
-      ? linked.map(o => `<span class="tag tag-po" title="${esc(o.supplier||'')}">${esc(o.no)}</span>`).join('')
-      : '<span class="tag tag-none">未关联</span>';
-    const budgetSub = (Number(it.qty)||0) * (Number(it.price)||0);
-    const cost = calcItemCost(it.id);
-    const diff = budgetSub - cost;
-    const diffCls = diff >= 0 ? 'diff-under' : 'diff-over';
-    html += `<tr>
-      <td><b>${esc(it.name)}</b>${it.note?`<div style="color:#94a3b8;font-size:11px;margin-top:4px;font-weight:600;">${esc(it.note).slice(0,40)}</div>`:''}</td>
-      <td>${esc(it.spec||'-')}</td>
-      <td>${it.qty||0} ${esc(it.unit||'')}</td>
-      <td class="amount">¥${fmt(it.price)}</td>
-      <td class="amount">¥${fmt(budgetSub)}</td>
-      <td class="amount cost">¥${fmt(cost)}</td>
-      <td class="amount ${diffCls}">¥${fmt(diff)}</td>
-      <td>${linkedHtml}</td>
-      <td>
-        <button class="btn btn-outline btn-sm" onclick="openItemModal('${it.id}')">编辑</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteItem('${it.id}')">删</button>
-      </td>
-    </tr>`;
-  });
-  html += '</tbody></table></div>';
-  html += '<div class="hint">“已采购成本”自动汇总自关联的采购单金额。一张采购单关联多个单项时，金额按单项数量均摊。预算结余 = 预算小计 − 已采购成本，负数红色表示超预算。</div>';
-  document.getElementById('contentArea').innerHTML = html;
-}
-
-/* ---------- 采购单表格 ---------- */
-function renderPOTable() {
-  const pcs = pos.filter(o => o.projectId === currentProjectId);
-  const its = items.filter(i => i.projectId === currentProjectId);
-  const total = pcs.reduce((s,o) => s + (Number(o.amount)||0), 0);
-
-  let html = `<div class="summary">
-    <div class="box">采购单<b>${pcs.length}</b></div>
-    <div class="box">采购金额合计<b>¥${fmt(total)}</b></div>
-  </div>`;
-
-  if (!pcs.length) {
-    html += '<div class="empty">还没有采购单，点右上角“＋ 采购单”添加哦！🛒</div>';
-    document.getElementById('contentArea').innerHTML = html;
-    return;
-  }
-
-  html += `<div class="table-wrap"><table><thead><tr>
-    <th>采购单号</th><th>供应商</th><th>日期</th><th>金额</th><th>状态</th>
-    <th style="width:26%">关联清单单项（均摊）</th><th style="width:100px">操作</th>
-  </tr></thead><tbody>`;
-
-  pcs.forEach(o => {
-    const linked = (o.itemIds||[]).map(iid => its.find(x => x.id === iid)).filter(Boolean);
-    const share = linked.length ? (Number(o.amount)||0) / linked.length : 0;
-    const linkedHtml = linked.length
-      ? linked.map(x => `<span class="tag">${esc(x.name)} <span style="color:#059669;font-weight:800">¥${fmt(share)}</span></span>`).join('')
-      : '<span class="tag tag-none">未关联</span>';
-    const stCls = o.status === '已验收' || o.status === '已付款' ? 'status-done' : 'status-pending';
-    html += `<tr>
-      <td><b>${esc(o.no)}</b></td>
-      <td>${esc(o.supplier||'-')}</td>
-      <td>${esc(o.date||'-')}</td>
-      <td class="amount">¥${fmt(o.amount)}</td>
-      <td class="${stCls}">${esc(o.status||'-')}</td>
-      <td>${linkedHtml}</td>
-      <td>
-        <button class="btn btn-outline btn-sm" onclick="openPOModal('${o.id}')">编辑</button>
-        <button class="btn btn-danger btn-sm" onclick="deletePO('${o.id}')">删</button>
-      </td>
-    </tr>`;
-  });
-  html += '</tbody></table></div>';
-  document.getElementById('contentArea').innerHTML = html;
-}
-
-/* ---------- 关联总览 ---------- */
-function renderMatrix() {
-  const its = items.filter(i => i.projectId === currentProjectId);
-  const pcs = pos.filter(o => o.projectId === currentProjectId);
-  if (!its.length || !pcs.length) {
-    document.getElementById('contentArea').innerHTML = '<div class="empty">需要同时有清单单项和采购单，才能看到关联总览哦~ 🧐</div>';
-    return;
-  }
-  const totalCost = its.reduce((s,i) => s + calcItemCost(i.id), 0);
-  let html = `<div class="summary">
-    <div class="box">单项<b>${its.length}</b></div>
-    <div class="box">采购单<b>${pcs.length}</b></div>
-    <div class="box">已关联单项<b>${its.filter(it => pcs.some(o => (o.itemIds||[]).includes(it.id))).length}</b></div>
-    <div class="box">成本合计<b>¥${fmt(totalCost)}</b></div>
-  </div>`;
-  html += `<div class="table-wrap"><table><thead><tr><th style="width:20%">清单单项</th>`;
-  pcs.forEach(o => { html += `<th style="text-align:center;font-size:12px;">${esc(o.no)}<br><span style="font-weight:600;color:#64748b;">¥${fmt(o.amount)}</span></th>`; });
-  html += `<th>该项成本合计</th></tr></thead><tbody>`;
-  its.forEach(it => {
-    const linked = pcs.filter(o => (o.itemIds||[]).includes(it.id));
-    html += `<tr><td><b>${esc(it.name)}</b><div style="color:#94a3b8;font-size:11px;margin-top:4px;">${esc(it.spec||'')}</div></td>`;
-    pcs.forEach(o => {
-      const hit = (o.itemIds||[]).includes(it.id);
-      if (hit) {
-        const share = (Number(o.amount)||0) / (o.itemIds||[]).length;
-        html += `<td style="text-align:center"><span style="color:#10b981;font-weight:800;font-size:16px;">✓</span><div style="font-size:11px;color:#d97706;font-weight:800;margin-top:2px;">¥${fmt(share)}</div></td>`;
-      } else {
-        html += `<td style="text-align:center"><span style="color:#e2e8f0;font-weight:800;">—</span></td>`;
-      }
-    });
-    const cost = calcItemCost(it.id);
-    html += `<td class="amount cost">¥${fmt(cost)}</td></tr>`;
-  });
-  html += '</tbody></table></div><div class="hint">✓ 表示该采购单包含此清单单项，下方小字为该采购单均摊到本单项的金额。</div>';
-  document.getElementById('contentArea').innerHTML = html;
-}
-
-/* ---------- 项目关联资料 ---------- */
-function renderProjectArchive() {
-  const list = archives.filter(a => a.projectId === currentProjectId);
-  if (!list.length) {
-    document.getElementById('contentArea').innerHTML = '<div class="empty">该项目还没有关联的归档资料。<br>到“资料归档”模式编辑资料，在“关联项目”里选择本项目即可。📁</div>';
-    return;
-  }
-  let html = `<div class="summary"><div class="box">关联资料<b>${list.length}</b></div></div>`;
-  html += `<div class="table-wrap"><table><thead><tr><th style="width:30%">资料名称</th><th>分类</th><th>状态</th><th>日期</th><th>金额</th><th style="width:100px">操作</th></tr></thead><tbody>`;
-  list.sort((a,b) => (b.date||'').localeCompare(a.date||''));
-  list.forEach(a => {
-    const catCfg = CATS[a.cat] || { name: '未分类', icon: '📁' };
-    const stCls = a.status === '已完成' ? 'status-done' : (a.status === '待处理' ? 'status-pending' : '');
-    html += `<tr>
-      <td><b>${esc(a.name)}</b></td>
-      <td>${catCfg.icon} ${catCfg.name}</td>
-      <td class="${stCls}">${esc(a.status||'-')}</td>
-      <td>${esc(a.date||'-')}</td>
-      <td class="amount">${a.amount ? '¥'+fmt(a.amount) : '-'}</td>
-      <td><button class="btn btn-outline btn-sm" onclick="openArchiveModal('${a.id}')">编辑</button></td>
-    </tr>`;
-  });
-  html += '</tbody></table></div><div class="hint">资料在“资料归档”模式下统一管理，这里只显示关联了当前项目的资料。</div>';
-  document.getElementById('contentArea').innerHTML = html;
-}
-
-/* =========================================================
-   项目、清单、采购单 的增删改
+   增删改操作 (项目、清单、采购)
    ========================================================= */
 function openProjectModal(id) {
   const isEdit = !!id;
@@ -1189,7 +1239,7 @@ function openProjectModal(id) {
   document.getElementById('pName').value = p ? p.name : '';
   document.getElementById('pCode').value = p ? (p.code||'') : '';
   document.getElementById('pStatus').value = p ? (p.status||'进行中') : '进行中';
-  document.getElementById('pOwner').value = p ? (p.owner||'') : '';
+  document.getElementById('pOwner').value = p ? (p.owner||'蒋哲') : '蒋哲'; // 默认蒋哲
   document.getElementById('pNote').value = p ? (p.note||'') : '';
   document.getElementById('projectMask').classList.add('show');
 }
@@ -1200,7 +1250,7 @@ function saveProject() {
   const id = document.getElementById('pEditId').value;
   const data = {
     name, code: document.getElementById('pCode').value.trim(), status: document.getElementById('pStatus').value,
-    owner: document.getElementById('pOwner').value.trim(), note: document.getElementById('pNote').value.trim()
+    owner: document.getElementById('pOwner').value.trim() || '蒋哲', note: document.getElementById('pNote').value.trim()
   };
   if (id) Object.assign(projects.find(x => x.id === id), data);
   else {
@@ -1209,6 +1259,7 @@ function saveProject() {
     currentProjectId = pid;
   }
   persistAll(); renderProjectList(); selectProject(currentProjectId); closeMask('projectMask');
+  confetti();
 }
 
 function editProject() {
@@ -1256,6 +1307,7 @@ function saveItem() {
   if (id) Object.assign(items.find(x => x.id === id), data);
   else items.push({ id: uid(), ...data });
   persistAll(); renderProjectList(); renderProjectContent(); closeMask('itemMask');
+  confetti();
 }
 
 function deleteItem(id) {
@@ -1285,7 +1337,7 @@ function openPOModal(id) {
   const sel = o ? (o.itemIds||[]) : [];
   const cl = document.getElementById('itemCheckList');
   if (!its.length) {
-    cl.innerHTML = '<div style="padding:12px;color:#94a3b8;font-size:13px;font-weight:600;">当前项目还没有清单单项，请先添加哦</div>';
+    cl.innerHTML = '<div style="padding:16px;color:var(--text-muted);font-size:14px;font-weight:700;">当前项目还没有清单单项，请先添加哦</div>';
   } else {
     cl.innerHTML = its.map(it => `<label class="check-item">
       <input type="checkbox" value="${it.id}" ${sel.includes(it.id)?'checked':''}>
@@ -1310,6 +1362,7 @@ function savePO() {
   if (id) Object.assign(pos.find(x => x.id === id), data);
   else pos.push({ id: uid(), ...data });
   persistAll(); renderProjectList(); renderProjectContent(); closeMask('poMask');
+  confetti();
 }
 
 function deletePO(id) {
@@ -1321,7 +1374,7 @@ function deletePO(id) {
 function closeMask(id) { document.getElementById(id).classList.remove('show'); }
 
 /* =========================================================
-   导出/导入 Excel (CSV)
+   导入导出
    ========================================================= */
 function exportProjectExcel() {
   if (!currentProjectId) return alert('请先选择项目');
@@ -1356,6 +1409,7 @@ function exportProjectExcel() {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+  showToast('表格已成功下载到本地啦！');
 }
 
 function openImportModal() {
@@ -1406,7 +1460,8 @@ function processCSV() {
     }
     if (importedCount > 0) {
       persistAll(); renderProjectList(); renderProjectContent(); closeMask('importMask');
-      alert(`成功导入 ${importedCount} 条清单单项！🎉`);
+      confetti();
+      showToast(`成功导入 ${importedCount} 条清单单项！🎉`);
     } else {
       alert('未解析到有效数据，请检查 CSV 格式。');
     }
